@@ -1,5 +1,6 @@
 <script lang="ts">
   import Navbar from "./Navbar.svelte";
+  import { page } from "$app/stores";
 </script>
 
 <div class="drawer">
@@ -27,8 +28,14 @@
       </label>
       <ul class="menu bg-base-100 w-56 rounded-box">
         <!-- Sidebar content here -->
-        <li class="hover-bordered"><a>Sidebar Item 1</a></li>
-        <li><a>Sidebar Item 2</a></li>
+        <li
+          class="hover-bordered"
+          aria-current={$page.url.pathname === "/binomial-distribution"
+            ? "page"
+            : undefined}
+        >
+          <a href="/binomial-distribution">Distribucion Binomial</a>
+        </li>
       </ul>
     </div>
   </div>
