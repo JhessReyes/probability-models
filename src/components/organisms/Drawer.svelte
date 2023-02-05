@@ -12,7 +12,6 @@
   <div class="drawer-side">
     <label for="drawer-menu" class="drawer-overlay" />
     <div class="menu p-4 w-80 bg-base-100">
-        
       <label for="drawer-menu" class="drawer-overlay btn btn-square btn-ghost">
         <!-- close icon -->
         <svg
@@ -26,9 +25,9 @@
           /></svg
         >
       </label>
-      <ul>
+      <ul class="menu bg-base-100 w-56 rounded-box">
         <!-- Sidebar content here -->
-        <li><a>Sidebar Item 1</a></li>
+        <li class="hover-bordered"><a>Sidebar Item 1</a></li>
         <li><a>Sidebar Item 2</a></li>
       </ul>
     </div>
