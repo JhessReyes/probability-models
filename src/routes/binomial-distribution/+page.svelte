@@ -7,6 +7,9 @@
   let valueN: string;
   let valueM: string;
   let valueP: string;
+  let valueX: string;
+  let lessThen = "<=";
+  let less = "<";
 
   function resolve(N: number, n: number, p: number) {
     let avg = average(n, p);
@@ -20,13 +23,45 @@
   >
   <div class="divider">Datos</div>
   <div class="flex justify-center w-full">
-    <div class="md:columns-4 sm:columns-1 sm:mx-10">
-      <InputForm
-        placeholder="Poblacion Total"
-        name="Poblacion"
-        variable="N"
-        bind:valueVariable={valueN}
-      />
+    <div
+      class={`${
+        valueP
+          ? valueX || valueN
+            ? "md:columns-4"
+            : "md:columns-5"
+          : "md:columns-4 sm:columns-1 sm:mx-10"
+      } `}
+    >
+      {#if !valueX}
+        <InputForm
+          placeholder="Poblacion Total"
+          name="Poblacion"
+          variable="N"
+          bind:valueVariable={valueN}
+        />
+      {/if}
+      {#if !valueN}
+        <div>
+          <InputForm
+            placeholder="Exitos"
+            name="Exitos"
+            variable="X"
+            bind:valueVariable={valueX}
+          >
+            {#if !valueN && valueX}
+              <select
+                class="select select-md select-secondary btn-secondary rounded-none mx-2"
+              >
+                <option selected>=</option>
+                <option>></option>
+                <option>{less}</option>
+                <option>>=</option>
+                <option>{lessThen}</option>
+              </select>
+            {/if}
+          </InputForm>
+        </div>
+      {/if}
       <InputForm
         placeholder="Muestra"
         name="Muestra"
@@ -62,10 +97,10 @@
   </div>
   <div class="divider">Resultados</div>
 
-  {#if valueN && valueM && valueP}
+  {#if valueN && valueM && valueP && valueN >= valueM}
     <subtitle
       class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
-      >Distribucion Binomial con poblacion finita</subtitle
+      >Distribucion Binomial con poblacion Finita</subtitle
     >
     <div class="stats shadow flex">
       <div class="stat">
@@ -175,5 +210,10 @@
         </div>
       </div>
     </div>
+  {:else if valueM && valueP}
+    <subtitle
+      class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
+      >Distribucion Binomial con poblacion Infinita</subtitle
+    >
   {/if}
 </section>
