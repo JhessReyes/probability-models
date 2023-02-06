@@ -10,16 +10,19 @@
 <div class="form-control w-full max-w-xs p-2">
   <label class="label justify-center">
     <span class="label-text">
-      <strong>{variable}:</strong>
+      <strong>{variable}: </strong>
       {name}
     </span>
   </label>
-  <input
-    disabled={disabled ? disabled : false}
-    type="number"
-    placeholder={placeholder ? placeholder : ""}
-    class="input input-bordered w-full max-w-xs input-group-lg"
-    bind:value={valueVariable}
-    min=0
-  />
+  <label class="input-group">
+    <slot />
+    <input
+      disabled={disabled ? disabled : false}
+      type="number"
+      placeholder={placeholder ? placeholder : ""}
+      class="input input-bordered w-full max-w-xs"
+      bind:value={valueVariable}
+      min="0"
+    />
+  </label>
 </div>
