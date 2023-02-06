@@ -63,6 +63,10 @@
   <div class="divider">Resultados</div>
 
   {#if valueN && valueM && valueP}
+    <subtitle
+      class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
+      >Distribucion Binomial con poblacion finita</subtitle
+    >
     <div class="stats shadow flex">
       <div class="stat">
         <div class="stat-figure text-secondary">
