@@ -1,0 +1,25 @@
+<script lang="ts">
+  export let placeholder: string = "";
+  export let variable: string = "";
+  export let name: string = "";
+  export let disabled: boolean = false;
+  export let valueVariable: string;
+</script>
+
+<!-- svelte-ignore a11y-label-has-associated-control -->
+<div class="form-control w-full max-w-xs p-2">
+  <label class="label justify-center">
+    <span class="label-text">
+      <strong>{variable}:</strong>
+      {name}
+    </span>
+  </label>
+  <input
+    disabled={disabled ? disabled : false}
+    type="number"
+    placeholder={placeholder ? placeholder : ""}
+    class="input input-bordered w-full max-w-xs input-group-lg"
+    bind:value={valueVariable}
+    min=0
+  />
+</div>
