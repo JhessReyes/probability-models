@@ -1,6 +1,6 @@
 <script lang="ts">
   import InputForm from "../../components/atoms/InputForm.svelte";
-  import { average, correctionFactor, deviation } from ".";
+  import { average, correctionFactor, deviation, kurtosis, skew } from ".";
   let avg: number = 0;
   let n: number;
   let p: number;
@@ -126,6 +126,48 @@
             parseInt(valueM),
             parseFloat(valueP)
           )}
+        </div>
+      </div>
+    </div>
+    <div class="stats shadow flex">
+      <div class="stat">
+        <div class="stat-figure text-secondary">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            class="inline-block w-8 h-8 stroke-current"
+            ><path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            /></svg
+          >
+        </div>
+        <div class="stat-title">Curtosis</div>
+        <div class="stat-value">
+          {kurtosis(parseInt(valueM), parseFloat(valueP))}
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-figure text-secondary">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            class="inline-block w-8 h-8 stroke-current"
+            ><path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            /></svg
+          >
+        </div>
+        <div class="stat-title">Sesgo</div>
+        <div class="stat-value">
+          {skew(parseInt(valueM), parseFloat(valueP))}
         </div>
       </div>
     </div>
