@@ -44,9 +44,92 @@ export function skew(n: number, p: number) {
   return sk.toFixed(4);
 }
 
+//function to calculate factorial
+function factorial(num: number) {
+  var factorial: number = 1;
+
+  while (num >= 1) {
+    factorial = factorial * num;
+    num--;
+  }
+
+  return factorial;
+}
+
+//function to calculate p(x=x)
+export function binomialProbability(x: number, n: number, p: number) {
+  p = p / 100;
+
+  let result =
+    (factorial(n) / (factorial(n - x) * factorial(x))) *
+    Math.pow(p, x) *
+    Math.pow(1 - p, n - x);
+  return result.toFixed(4);
+}
+
+//function to calculate p(x=x) (n)
+export function binomialProbabilityN(
+  x0: number,
+  x: number,
+  n: number,
+  p: number
+) {
+  let result: number = 0;
+  for (let i = x0; i <= x; i++) {
+    result += parseFloat(binomialProbability(i, n, p));
+  }
+  return result.toFixed(4);
+}
+
+//function to create a graph
+export function optionsBinomialDistribution(
+  n: number,
+  p: number,
+  title: string
+) {
+  let dataX: Array<number> = [];
+  let dataY: Array<number> = [];
+  let options;
+
+  for (let i = 0; i <= n; i++) {
+    let position = parseFloat(binomialProbability(i, n, p));
+    dataY.push(position);
+    dataX.push(i);
+  }
+
+  options = {
+    title: { text: "" },
+    tooltip: {},
+    toolbox: {
+      feature: {
+        dataView: {},
+        saveAsImage: {
+          pixelRatio: 2,
+        },
+        restore: {},
+      },
+    },
+    xAxis: { type: "category", data: dataX },
+    yAxis: { type: "value" },
+    series: [
+      {
+        type: "line",
+        smooth: true,
+        data: dataY,
+      },
+    ],
+  };
+
+  return options;
+}
+
 export default {
   average,
   correctionFactor,
   deviation,
   kurtosis,
+  skew,
+  binomialProbability,
+  optionsBinomialDistribution,
+  binomialProbabilityN,
 };
