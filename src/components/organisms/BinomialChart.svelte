@@ -41,6 +41,6 @@
 </script>
 
 <div
-  class="w-[275px] h-[500px] p-4 sm:w-full sm:h-full sm:p-6 "
+  class="w-[275px] h-[500px] p-4 sm:w-full sm:h-[350px]"
   bind:this={element}
 />
