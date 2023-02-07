@@ -110,11 +110,20 @@
   </div>
   <div class="divider">Resultados</div>
 
+  <!-- title validations -->
   {#if valueN && valueM && valueP && valueN >= valueM}
     <subtitle
       class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
       >Distribucion Binomial con poblacion Finita</subtitle
     >
+  {:else if valueM && valueP && valueX}
+    <subtitle
+      class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
+      >Distribucion Binomial con poblacion Infinita</subtitle
+    >
+  {/if}
+
+  {#if valueM && valueP}
     <div class="stats shadow flex">
       <div class="stat">
         <div class="stat-figure text-secondary">
@@ -178,6 +187,9 @@
         </div>
       </div>
     </div>
+  {/if}
+
+  {#if valueN && valueM && valueP && valueN >= valueM}
     <div class="stats shadow flex">
       <div class="stat">
         <div class="stat-figure text-secondary">
@@ -224,11 +236,6 @@
         </div>
       </div>
     </div>
-  {:else if valueM && valueP}
-    <subtitle
-      class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
-      >Distribucion Binomial con poblacion Infinita</subtitle
-    >
   {/if}
   {#if valueM && valueP && parseInt(valueP) <= 100}
     <div class="divider">Grafico</div>
