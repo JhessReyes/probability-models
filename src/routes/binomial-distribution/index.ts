@@ -44,6 +44,17 @@ export function skew(n: number, p: number) {
   return sk.toFixed(4);
 }
 
+//function to calculate factorial
+function factorial(num: number) {
+  var factorial: number = 1;
+
+  while (num >= 1) {
+    factorial = factorial * num;
+    num--;
+  }
+
+  return factorial;
+}
 export default {
   average,
   correctionFactor,

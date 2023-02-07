@@ -10,10 +10,6 @@
   let valueX: string;
   let lessThen = "<=";
   let less = "<";
-
-  function resolve(N: number, n: number, p: number) {
-    let avg = average(n, p);
-  }
 </script>
 
 <section id="binomial-distribution">
@@ -217,3 +213,4 @@
     >
   {/if}
 </section>
+<LineChart />
