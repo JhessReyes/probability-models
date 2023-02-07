@@ -2,11 +2,8 @@
   import { onMount } from "svelte";
   import * as echarts from "echarts";
 
-  export let dataX: Array<[]>;
-  export let dataY: Array<[]>;
-  export let title: string;
   const setOption = {
-    title: { text: title },
+    title: { text: "" },
     tooltip: {},
     toolbox: {
       feature: {
@@ -17,28 +14,33 @@
         restore: {},
       },
     },
-    xAxis: { type: "category", data: dataX },
+    xAxis: { type: "category", data: [] },
     yAxis: { type: "value" },
     series: [
       {
         type: "line",
         smooth: true,
-        data: dataY,
+        data: [],
       },
     ],
   };
+
   let element: any = null;
   let chart: any = null;
+  export let options: any = null;
 
+  $: chart?.setOption(options);
   onMount(async () => {
     chart = echarts.init(element, {
       width: "auto",
       renderer: "canvas",
     });
-    chart.setOption(setOption);
+    let defaultOption = (await options) || setOption;
+    chart.setOption(defaultOption);
   });
 </script>
 
-{#if title && dataX && dataY}
-  <div class="w-full h-full" bind:this={element} />
-{/if}
+<div
+  class="w-[275px] h-[500px] p-4 sm:w-full sm:h-full sm:p-6 "
+  bind:this={element}
+/>
