@@ -17,7 +17,11 @@
   let valueP: string;
   let valueX: string;
   let lessThen = "<=";
+  let equal = "=";
   let less = "<";
+
+  let selected = "=";
+  let options = ["=", "<="];
 </script>
 
 <section id="binomial-distribution">
@@ -49,18 +53,23 @@
           <InputForm
             placeholder="Exitos"
             name="Exitos"
-            variable="X"
+            variable="x"
             bind:valueVariable={valueX}
           >
             {#if !valueN && valueX}
+              {#if selected !== "="}
+                <input
+                  type="number"
+                  placeholder={"x0"}
+                  class="input input-bordered w-full max-w-xs"
+                  min="0"
+                />
+              {/if}
               <select
                 class="select select-md select-secondary btn-secondary rounded-none mx-2"
+                bind:value={selected}
               >
-                <option selected>=</option>
-                <option>></option>
-                <option>{less}</option>
-                <option>>=</option>
-                <option>{lessThen}</option>
+                {#each options as value}<option {value}>{value}</option>{/each}
               </select>
             {/if}
           </InputForm>
