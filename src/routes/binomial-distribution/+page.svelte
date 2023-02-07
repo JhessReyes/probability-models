@@ -220,11 +220,14 @@
       >Distribucion Binomial con poblacion Infinita</subtitle
     >
   {/if}
+  {#if valueM && valueP && valueN >= valueM && parseInt(valueP) <= 100}
+    <div class="divider">Grafico</div>
+    <BinomialChart
+      options={optionsBinomialDistribution(
+        parseInt(valueM),
+        parseFloat(valueP),
+        "Distribucion Binomial"
+      )}
+    />
+  {/if}
 </section>
-<BinomialChart
-  options={optionsBinomialDistribution(
-    parseInt(valueM),
-    parseFloat(valueP),
-    "Distribucion Binomial"
-  )}
-/>
