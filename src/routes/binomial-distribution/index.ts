@@ -67,6 +67,20 @@ export function binomialProbability(x: number, n: number, p: number) {
   return result.toFixed(4);
 }
 
+//function to calculate p(x=x) (n)
+export function binomialProbabilityN(
+  x0: number,
+  x: number,
+  n: number,
+  p: number
+) {
+  let result: number = 0;
+  for (let i = x0; i <= x; i++) {
+    result += parseFloat(binomialProbability(i, n, p));
+  }
+  return result.toFixed(4);
+}
+
 //function to create a graph
 export function optionsBinomialDistribution(
   n: number,
@@ -117,4 +131,5 @@ export default {
   skew,
   binomialProbability,
   optionsBinomialDistribution,
+  binomialProbabilityN,
 };

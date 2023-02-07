@@ -2,6 +2,8 @@
   import InputForm from "../../components/atoms/InputForm.svelte";
   import {
     average,
+    binomialProbability,
+    binomialProbabilityN,
     correctionFactor,
     deviation,
     kurtosis,
@@ -9,17 +11,11 @@
     skew,
   } from ".";
   import BinomialChart from "../../components/organisms/BinomialChart.svelte";
-  let avg: number = 0;
-  let n: number;
-  let p: number;
   let valueN: string;
   let valueM: string;
   let valueP: string;
   let valueX: string;
-  let lessThen = "<=";
-  let equal = "=";
-  let less = "<";
-
+  let valueX0: string;
   let selected = "=";
   let options = ["=", "<="];
 </script>
@@ -63,6 +59,7 @@
                   placeholder={"x0"}
                   class="input input-bordered w-full max-w-xs"
                   min="0"
+                  bind:value={valueX0}
                 />
               {/if}
               <select
@@ -189,6 +186,71 @@
     </div>
   {/if}
 
+  <!-- infinite contidions -->
+  {#if valueM && valueP && parseInt(valueX) >= 0 && !valueN}
+    <div class="stats shadow flex">
+      <div class="stat">
+        <div class="stat-figure text-secondary">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            class="inline-block w-8 h-8 stroke-current"
+            ><path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            /></svg
+          >
+        </div>
+        <div class="stat-title justify-center">
+          Probabilidad segun condiciones de exito
+        </div>
+        <div class="stat-value">
+          {#if selected !== "="}
+            {binomialProbabilityN(
+              parseInt(valueX0),
+              parseInt(valueX),
+              parseInt(valueM),
+              parseFloat(valueP)
+            ) +
+              " = " +
+              (
+                parseFloat(
+                  binomialProbabilityN(
+                    parseInt(valueX0),
+                    parseInt(valueX),
+                    parseInt(valueM),
+                    parseFloat(valueP)
+                  )
+                ) * 100
+              ).toFixed(2) +
+              "%"}
+          {:else}
+            {binomialProbability(
+              parseInt(valueX),
+              parseInt(valueM),
+              parseFloat(valueP)
+            ) +
+              " = " +
+              (
+                parseFloat(
+                  binomialProbability(
+                    parseInt(valueX),
+                    parseInt(valueM),
+                    parseFloat(valueP)
+                  )
+                ) * 100
+              ).toFixed(2) +
+              "%"}
+          {/if}
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  <!-- finite conditions -->
   {#if valueN && valueM && valueP && valueN >= valueM}
     <div class="stats shadow flex">
       <div class="stat">
