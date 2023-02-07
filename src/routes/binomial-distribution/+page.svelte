@@ -1,6 +1,7 @@
 <script lang="ts">
   import InputForm from "../../components/atoms/InputForm.svelte";
   import { average, correctionFactor, deviation, kurtosis, skew } from ".";
+  import LineChart from "../../components/organisms/LineChart.svelte";
   let avg: number = 0;
   let n: number;
   let p: number;
@@ -213,4 +214,4 @@
     >
   {/if}
 </section>
-<LineChart />
+<!-- <LineChart /> -->
