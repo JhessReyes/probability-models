@@ -14,6 +14,7 @@
   let valueN: string;
   let valueM: string;
   let valueP: string;
+  let valueQ: string;
   let valueX: string;
   let valueX0: string;
   let selected = "=";
@@ -27,69 +28,75 @@
   >
   <div class="divider">Datos</div>
   <div class="flex justify-center w-full">
-    <div
-      class={`${
-        valueP
-          ? valueX || valueN
-            ? "md:columns-4"
-            : "md:columns-5"
-          : "md:columns-4 sm:columns-1 sm:mx-10"
-      } `}
-    >
-      {#if !valueX}
+    <div class="md:columns-6 sm:columns-1 sm:mx-10">
+      <InputForm
+        placeholder="Poblacion Total"
+        name="Poblacion"
+        variable="N"
+        bind:valueVariable={valueN}
+      />
+      <div>
         <InputForm
-          placeholder="Poblacion Total"
-          name="Poblacion"
-          variable="N"
-          bind:valueVariable={valueN}
-        />
-      {/if}
-      {#if !valueN}
-        <div>
-          <InputForm
-            placeholder="Exitos"
-            name="Exitos"
-            variable="x"
-            bind:valueVariable={valueX}
+          placeholder="Exitos"
+          name="Exitos"
+          variable="x"
+          bind:valueVariable={valueX}
+        >
+          {#if selected !== "="}
+            <input
+              type="number"
+              placeholder={"x0"}
+              class="input input-bordered w-full max-w-xs"
+              min="0"
+              bind:value={valueX0}
+            />
+          {/if}
+          <select
+            class="select select-md select-secondary btn-secondary rounded-none mx-2"
+            bind:value={selected}
           >
-            {#if !valueN && valueX}
-              {#if selected !== "="}
-                <input
-                  type="number"
-                  placeholder={"x0"}
-                  class="input input-bordered w-full max-w-xs"
-                  min="0"
-                  bind:value={valueX0}
-                />
-              {/if}
-              <select
-                class="select select-md select-secondary btn-secondary rounded-none mx-2"
-                bind:value={selected}
-              >
-                {#each options as value}<option {value}>{value}</option>{/each}
-              </select>
-            {/if}
-          </InputForm>
-        </div>
-      {/if}
+            {#each options as value}<option {value}>{value}</option>{/each}
+          </select>
+        </InputForm>
+      </div>
       <InputForm
         placeholder="Muestra"
         name="Muestra"
         variable="n"
         bind:valueVariable={valueM}
       />
-      <InputForm
-        placeholder="Probabilidad exito"
-        name="% exito"
-        variable="p"
-        bind:valueVariable={valueP}
-      />
-      {#if parseInt(valueP) > 100}
+      {#if valueQ}
+        {@const valueP = 100 - parseFloat(valueQ)}
+        <InputForm
+          disabled={true}
+          valueVariable={valueP.toFixed(2).toString()}
+          name="% exito"
+          variable="p"
+        />
+      {/if}
+      {#if !valueQ}
+        <InputForm
+          placeholder="Probabilidad exito"
+          name="% exito"
+          variable="p"
+          bind:valueVariable={valueP}
+        />
+      {/if}
+
+      {#if !valueP}
+        <InputForm
+          placeholder="Probabilidad fracaso"
+          name="% fracaso"
+          variable="q"
+          bind:valueVariable={valueQ}
+        />
+      {/if}
+      {#if parseInt(valueP) > 100 || parseInt(valueQ) > 100}
         <div class="alert alert-error shadow-lg sm:mx-10">
           no puede ser mayor a 100
         </div>
       {/if}
-      {#if parseInt(valueP) < 0}
+      {#if parseInt(valueP) < 0 || parseInt(valueQ) < 0}
         <div class="alert alert-error shadow-lg sm:mx-10">
           no puede ser menor a 0
         </div>
@@ -108,15 +115,16 @@
   <div class="divider">Resultados</div>
 
   <!-- title validations -->
-  {#if valueN && valueM && valueP && valueN >= valueM}
+  {#if (!valueN || valueM <= (parseInt(valueN) * 0.05).toFixed(7)) && valueP}
+    <subtitle class="flex justify-center text-center text-[12px] sm:text-[25px]"
+      >Distribucion Binomial con poblacion:
+      <div class="text-primary space-x-4 font-bold mx-2">Infinita</div>
+    </subtitle>
+  {:else if valueN && valueM && valueP && valueN >= valueM}
     <subtitle
       class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
-      >Distribucion Binomial con poblacion Finita</subtitle
-    >
-  {:else if valueM && valueP && valueX}
-    <subtitle
-      class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
-      >Distribucion Binomial con poblacion Infinita</subtitle
+      >Distribucion Binomial con poblacion:
+      <div class="text-primary space-x-4 font-bold mx-2">Finita</div></subtitle
     >
   {/if}
 
@@ -187,7 +195,7 @@
   {/if}
 
   <!-- infinite contidions -->
-  {#if valueM && valueP && parseInt(valueX) >= 0 && !valueN}
+  {#if valueN >= valueM || (valueP && parseInt(valueX) >= 0)}
     <div class="stats shadow flex">
       <div class="stat">
         <div class="stat-figure text-secondary">
