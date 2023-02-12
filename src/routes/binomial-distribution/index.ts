@@ -64,7 +64,7 @@ export function binomialProbability(x: number, n: number, p: number) {
     (factorial(n) / (factorial(n - x) * factorial(x))) *
     Math.pow(p, x) *
     Math.pow(1 - p, n - x);
-  return result.toFixed(4);
+  return result.toFixed(7);
 }
 
 //function to calculate p(x=x) (n)
@@ -78,7 +78,7 @@ export function binomialProbabilityN(
   for (let i = x0; i <= x; i++) {
     result += parseFloat(binomialProbability(i, n, p));
   }
-  return result.toFixed(4);
+  return result.toFixed(7);
 }
 
 //function to create a graph
