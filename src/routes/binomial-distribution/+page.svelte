@@ -23,12 +23,12 @@
 
 <section id="binomial-distribution">
   <title
-    class="flex justify-center text-center text-[25px] sm:text-[50px] font-extrabold tracking-widest"
+    class="flex justify-center text-center text-[25px] sm:text-[50px] font-extrabold"
     >Distribucion Binomial</title
   >
   <div class="divider">Datos</div>
   <div class="flex justify-center w-full">
-    <div class="md:columns-6 sm:columns-1 sm:mx-10">
+    <div class="md:columns-5 sm:columns-1 sm:mx-10">
       <InputForm
         placeholder="Poblacion Total"
         name="Poblacion"
@@ -128,7 +128,9 @@
     >
   {/if}
 
-  {#if valueM && valueP}
+  {#if valueM && (valueP || valueQ)}
+    {@const valueRes =
+      parseFloat(valueQ) > 0 ? 100 - parseFloat(valueQ) : parseFloat(valueP)}
     <div class="stats shadow flex">
       <div class="stat">
         <div class="stat-figure text-secondary">
@@ -147,7 +149,7 @@
         </div>
         <div class="stat-title">Media</div>
         <div class="stat-value">
-          {average(parseInt(valueM), parseFloat(valueP))}
+          {average(parseInt(valueM), valueRes)}
         </div>
       </div>
 
@@ -168,7 +170,7 @@
         </div>
         <div class="stat-title">Curtosis</div>
         <div class="stat-value">
-          {kurtosis(parseInt(valueM), parseFloat(valueP))}
+          {kurtosis(parseInt(valueM), valueRes)}
         </div>
       </div>
       <div class="stat">
@@ -188,14 +190,16 @@
         </div>
         <div class="stat-title">Sesgo</div>
         <div class="stat-value">
-          {skew(parseInt(valueM), parseFloat(valueP))}
+          {skew(parseInt(valueM), valueRes)}
         </div>
       </div>
     </div>
   {/if}
 
   <!-- infinite contidions -->
-  {#if valueN >= valueM || (valueP && parseInt(valueX) >= 0)}
+  {#if (valueN >= valueM || valueP || valueQ) && parseInt(valueX) >= 0}
+    {@const valueRes =
+      parseFloat(valueQ) > 0 ? 100 - parseFloat(valueQ) : parseFloat(valueP)}
     <div class="stats shadow flex">
       <div class="stat">
         <div class="stat-figure text-secondary">
@@ -221,7 +225,7 @@
               parseInt(valueX0),
               parseInt(valueX),
               parseInt(valueM),
-              parseFloat(valueP)
+              valueRes
             ) +
               " = " +
               (
@@ -230,27 +234,23 @@
                     parseInt(valueX0),
                     parseInt(valueX),
                     parseInt(valueM),
-                    parseFloat(valueP)
+                    valueRes
                   )
                 ) * 100
-              ).toFixed(2) +
+              ).toFixed(7) +
               "%"}
           {:else}
-            {binomialProbability(
-              parseInt(valueX),
-              parseInt(valueM),
-              parseFloat(valueP)
-            ) +
+            {binomialProbability(parseInt(valueX), parseInt(valueM), valueRes) +
               " = " +
               (
                 parseFloat(
                   binomialProbability(
                     parseInt(valueX),
                     parseInt(valueM),
-                    parseFloat(valueP)
+                    valueRes
                   )
                 ) * 100
-              ).toFixed(2) +
+              ).toFixed(7) +
               "%"}
           {/if}
         </div>
@@ -259,7 +259,9 @@
   {/if}
 
   <!-- finite conditions -->
-  {#if valueN && valueM && valueP && valueN >= valueM}
+  {#if valueN && valueM && (valueP || valueQ) && valueN >= valueM}
+    {@const valueRes =
+      parseFloat(valueQ) > 0 ? 100 - parseFloat(valueQ) : parseFloat(valueP)}
     <div class="stats shadow flex">
       <div class="stat">
         <div class="stat-figure text-secondary">
@@ -301,18 +303,20 @@
           {deviation(
             parseFloat(correctionFactor(parseInt(valueN), parseInt(valueM))),
             parseInt(valueM),
-            parseFloat(valueP)
+            valueRes
           )}
         </div>
       </div>
     </div>
   {/if}
-  {#if valueM && valueP && parseInt(valueP) <= 100}
+  {#if valueM && (valueP || valueQ)}
+    {@const valueRes =
+      parseFloat(valueQ) > 0 ? 100 - parseFloat(valueQ) : parseFloat(valueP)}
     <div class="divider">Grafico</div>
     <BinomialChart
       options={optionsBinomialDistribution(
         parseInt(valueM),
-        parseFloat(valueP),
+        valueRes,
         "Distribucion Binomial"
       )}
     />
