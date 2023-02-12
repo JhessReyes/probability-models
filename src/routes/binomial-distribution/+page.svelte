@@ -170,7 +170,18 @@
         </div>
         <div class="stat-title">Curtosis</div>
         <div class="stat-value">
-          {kurtosis(parseInt(valueM), valueRes)}
+          <div class="flex flex-col">
+            <div>
+              {kurtosis(parseInt(valueM), valueRes)}
+            </div>
+            <span class="text-sm my-2">
+              {parseFloat(kurtosis(parseInt(valueM), valueRes)) < 0
+                ? "PLATICÚRTICA"
+                : parseFloat(kurtosis(parseInt(valueM), valueRes)) == 0
+                ? "MESOCÚRTICA"
+                : "LEPTOCÚRTICA"}
+            </span>
+          </div>
         </div>
       </div>
       <div class="stat">
@@ -190,7 +201,18 @@
         </div>
         <div class="stat-title">Sesgo</div>
         <div class="stat-value">
-          {skew(parseInt(valueM), valueRes)}
+          <div class="flex flex-col">
+            <div>
+              {skew(parseInt(valueN), valueRes) }
+            </div>
+            <span class="text-sm my-2">
+              {parseFloat(skew(parseInt(valueN), valueRes)) < 0
+                ? "SESGO NEGATIVO"
+                : parseFloat(skew(parseInt(valueN), valueRes)) == 0
+                ? "SESGO NEUTRO MEDIO"
+                : "SESGO POSITIVO"}
+            </span>
+          </div>
         </div>
       </div>
     </div>
