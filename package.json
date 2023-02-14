@@ -38,6 +38,7 @@
 		"@fortawesome/free-regular-svg-icons": "^6.2.1",
 		"@fortawesome/free-solid-svg-icons": "^6.2.1",
 		"daisyui": "^2.50.0",
-		"echarts": "^5.4.1"
+		"echarts": "^5.4.1",
+		"svelte-notifications": "^0.9.98"
 	}
 }

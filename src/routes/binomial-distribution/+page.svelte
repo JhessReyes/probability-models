@@ -11,6 +11,27 @@
     skew,
   } from ".";
   import BinomialChart from "../../components/organisms/BinomialChart.svelte";
+  import { getNotificationsContext } from "svelte-notifications";
+  const { addNotification } = getNotificationsContext();
+
+  const bigger0 = () => {
+    addNotification({
+      text: "No puede ser mayor a 100",
+      position: "bottom-right",
+      type: "error",
+      removeAfter: 2000,
+    });
+    return "";
+  };
+  const less0 = () => {
+    addNotification({
+      text: "No puede ser menor a 0",
+      position: "bottom-right",
+      type: "error",
+      removeAfter: 2000,
+    });
+    return "";
+  };
   let valueN: string;
   let valueM: string;
   let valueP: string;
@@ -92,14 +113,10 @@
         />
       {/if}
       {#if parseInt(valueP) > 100 || parseInt(valueQ) > 100}
-        <div class="alert alert-error shadow-lg sm:mx-10">
-          no puede ser mayor a 100
-        </div>
+        {bigger0()}
       {/if}
       {#if parseInt(valueP) < 0 || parseInt(valueQ) < 0}
-        <div class="alert alert-error shadow-lg sm:mx-10">
-          no puede ser menor a 0
-        </div>
+        {less0()}
       {/if}
       {#if valueP}
         {@const valueQ = 100 - parseFloat(valueP)}
@@ -203,12 +220,12 @@
         <div class="stat-value">
           <div class="flex flex-col">
             <div>
-              {skew(parseInt(valueN), valueRes) }
+              {skew(parseInt(valueM), valueRes)}
             </div>
             <span class="text-sm my-2">
-              {parseFloat(skew(parseInt(valueN), valueRes)) < 0
+              {parseFloat(skew(parseInt(valueM), valueRes)) < 0
                 ? "SESGO NEGATIVO"
-                : parseFloat(skew(parseInt(valueN), valueRes)) == 0
+                : parseFloat(skew(parseInt(valueM), valueRes)) == 0
                 ? "SESGO NEUTRO MEDIO"
                 : "SESGO POSITIVO"}
             </span>
