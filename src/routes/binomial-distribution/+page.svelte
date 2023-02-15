@@ -12,6 +12,7 @@
   } from ".";
   import BinomialChart from "../../components/organisms/BinomialChart.svelte";
   import { getNotificationsContext } from "svelte-notifications";
+  import Stat from "../../components/atoms/Stat.svelte";
   const { addNotification } = getNotificationsContext();
 
   const bigger0 = () => {
@@ -149,89 +150,35 @@
     {@const valueRes =
       parseFloat(valueQ) > 0 ? 100 - parseFloat(valueQ) : parseFloat(valueP)}
     <div class="stats shadow flex">
-      <div class="stat">
-        <div class="stat-figure text-secondary">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            class="inline-block w-8 h-8 stroke-current"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            /></svg
-          >
-        </div>
-        <div class="stat-title">Media</div>
-        <div class="stat-value">
-          {average(parseInt(valueM), valueRes)}
-        </div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-figure text-secondary">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            class="inline-block w-8 h-8 stroke-current"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            /></svg
-          >
-        </div>
-        <div class="stat-title">Curtosis</div>
-        <div class="stat-value">
-          <div class="flex flex-col">
-            <div>
-              {kurtosis(parseInt(valueM), valueRes)}
-            </div>
-            <span class="text-sm my-2">
-              {parseFloat(kurtosis(parseInt(valueM), valueRes)) < 0
-                ? "PLATICÚRTICA"
-                : parseFloat(kurtosis(parseInt(valueM), valueRes)) == 0
-                ? "MESOCÚRTICA"
-                : "LEPTOCÚRTICA"}
-            </span>
+      <Stat statTitle="Media" statValue={average(parseInt(valueM), valueRes)} />
+      <Stat statTitle="Curtosis">
+        <div class="flex flex-col">
+          <div>
+            {kurtosis(parseInt(valueM), valueRes)}
           </div>
+          <span class="text-sm my-2">
+            {parseFloat(kurtosis(parseInt(valueM), valueRes)) < 0
+              ? "PLATICÚRTICA"
+              : parseFloat(kurtosis(parseInt(valueM), valueRes)) == 0
+              ? "MESOCÚRTICA"
+              : "LEPTOCÚRTICA"}
+          </span>
         </div>
-      </div>
-      <div class="stat">
-        <div class="stat-figure text-secondary">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            class="inline-block w-8 h-8 stroke-current"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            /></svg
-          >
-        </div>
-        <div class="stat-title">Sesgo</div>
-        <div class="stat-value">
-          <div class="flex flex-col">
-            <div>
-              {skew(parseInt(valueM), valueRes)}
-            </div>
-            <span class="text-sm my-2">
-              {parseFloat(skew(parseInt(valueM), valueRes)) < 0
-                ? "SESGO NEGATIVO"
-                : parseFloat(skew(parseInt(valueM), valueRes)) == 0
-                ? "SESGO NEUTRO MEDIO"
-                : "SESGO POSITIVO"}
-            </span>
+      </Stat>
+      <Stat statTitle="Sesgo">
+        <div class="flex flex-col">
+          <div>
+            {skew(parseInt(valueM), valueRes)}
           </div>
+          <span class="text-sm my-2">
+            {parseFloat(skew(parseInt(valueM), valueRes)) < 0
+              ? "SESGO NEGATIVO"
+              : parseFloat(skew(parseInt(valueM), valueRes)) == 0
+              ? "SESGO NEUTRO MEDIO"
+              : "SESGO POSITIVO"}
+          </span>
         </div>
-      </div>
+      </Stat>
     </div>
   {/if}
 
@@ -240,60 +187,41 @@
     {@const valueRes =
       parseFloat(valueQ) > 0 ? 100 - parseFloat(valueQ) : parseFloat(valueP)}
     <div class="stats shadow flex">
-      <div class="stat">
-        <div class="stat-figure text-secondary">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            class="inline-block w-8 h-8 stroke-current"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            /></svg
-          >
-        </div>
-        <div class="stat-title justify-center">
-          Probabilidad segun condiciones de exito
-        </div>
-        <div class="stat-value">
-          {#if selected !== "="}
-            {binomialProbabilityN(
-              parseInt(valueX0),
-              parseInt(valueX),
-              parseInt(valueM),
-              valueRes
-            ) +
-              " = " +
-              (
-                parseFloat(
-                  binomialProbabilityN(
-                    parseInt(valueX0),
-                    parseInt(valueX),
-                    parseInt(valueM),
-                    valueRes
-                  )
-                ) * 100
-              ).toFixed(7) +
-              "%"}
-          {:else}
-            {binomialProbability(parseInt(valueX), parseInt(valueM), valueRes) +
-              " = " +
-              (
-                parseFloat(
-                  binomialProbability(
-                    parseInt(valueX),
-                    parseInt(valueM),
-                    valueRes
-                  )
-                ) * 100
-              ).toFixed(7) +
-              "%"}
-          {/if}
-        </div>
-      </div>
+      <Stat statTitle="Probabilidad segun condiciones de exito">
+        {#if selected !== "="}
+          {binomialProbabilityN(
+            parseInt(valueX0),
+            parseInt(valueX),
+            parseInt(valueM),
+            valueRes
+          ) +
+            " = " +
+            (
+              parseFloat(
+                binomialProbabilityN(
+                  parseInt(valueX0),
+                  parseInt(valueX),
+                  parseInt(valueM),
+                  valueRes
+                )
+              ) * 100
+            ).toFixed(7) +
+            "%"}
+        {:else}
+          {binomialProbability(parseInt(valueX), parseInt(valueM), valueRes) +
+            " = " +
+            (
+              parseFloat(
+                binomialProbability(
+                  parseInt(valueX),
+                  parseInt(valueM),
+                  valueRes
+                )
+              ) * 100
+            ).toFixed(7) +
+            "%"}
+        {/if}
+      </Stat>
     </div>
   {/if}
 
@@ -302,50 +230,20 @@
     {@const valueRes =
       parseFloat(valueQ) > 0 ? 100 - parseFloat(valueQ) : parseFloat(valueP)}
     <div class="stats shadow flex">
-      <div class="stat">
-        <div class="stat-figure text-secondary">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            class="inline-block w-8 h-8 stroke-current"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            /></svg
-          >
-        </div>
-        <div class="stat-title">Factor de Corrección</div>
-        <div class="stat-value">
-          {parseFloat(correctionFactor(parseInt(valueN), parseInt(valueM)))}
-        </div>
-      </div>
-      <div class="stat">
-        <div class="stat-figure text-secondary">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            class="inline-block w-8 h-8 stroke-current"
-            ><path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            /></svg
-          >
-        </div>
-        <div class="stat-title">Desviación</div>
-        <div class="stat-value">
-          {deviation(
-            parseFloat(correctionFactor(parseInt(valueN), parseInt(valueM))),
-            parseInt(valueM),
-            valueRes
-          )}
-        </div>
-      </div>
+      <Stat
+        statTitle="Factor de Corrección"
+        statValue={parseFloat(
+          correctionFactor(parseInt(valueN), parseInt(valueM))
+        ).toString()}
+      />
+      <Stat
+        statTitle="Desviación"
+        statValue={deviation(
+          parseFloat(correctionFactor(parseInt(valueN), parseInt(valueM))),
+          parseInt(valueM),
+          valueRes
+        )}
+      />
     </div>
   {/if}
   {#if valueM && (valueP || valueQ)}
