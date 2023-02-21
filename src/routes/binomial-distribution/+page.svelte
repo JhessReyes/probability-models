@@ -15,6 +15,15 @@
   import Stat from "../../components/atoms/Stat.svelte";
   const { addNotification } = getNotificationsContext();
 
+  const required = (variable: string) => {
+    addNotification({
+      text: "La variable: " + variable + " es requerida",
+      position: "bottom-right",
+      type: "error",
+      removeAfter: 2000,
+    });
+    return "";
+  };
   const bigger0 = () => {
     addNotification({
       text: "No puede ser mayor a 100",
@@ -37,6 +46,7 @@
   let valueM: string;
   let valueP: string;
   let valueQ: string;
+  let valueK: string;
   let valueX: string;
   let valueX0: string;
   let selected = "=";
@@ -50,7 +60,7 @@
   >
   <div class="divider">Datos</div>
   <div class="flex justify-center w-full">
-    <div class="md:columns-5 sm:columns-1 sm:mx-10">
+    <div class="md:columns-3 sm:columns-1 sm:mx-10">
       <InputForm
         placeholder="Poblacion Total"
         name="Poblacion"
@@ -87,8 +97,20 @@
         variable="n"
         bind:valueVariable={valueM}
       />
+    </div>
+  </div>
+  <div class="flex justify-center w-full">
+    <div class="md:columns-3 sm:columns-1 sm:mx-10">
+      <!-- If insert the valueQ show the results to the other variables-->
       {#if valueQ}
         {@const valueP = 100 - parseFloat(valueQ)}
+        {@const valueK = (valueP * parseFloat(valueN)) / 100 || 0}
+        <InputForm
+          disabled={true}
+          valueVariable={valueK.toFixed(2).toString()}
+          name="n° individuos"
+          variable="K"
+        />
         <InputForm
           disabled={true}
           valueVariable={valueP.toFixed(2).toString()}
@@ -96,7 +118,29 @@
           variable="p"
         />
       {/if}
-      {#if !valueQ}
+      <!-- end valueQ -->
+
+      {#if !valueP && !valueQ}
+        <InputForm
+          placeholder="n° Individuos"
+          bind:valueVariable={valueK}
+          name="n° Individuos"
+          variable="K"
+        />
+      {/if}
+
+      <!-- If insert the valueP show the results to the other variables-->
+      {#if valueP}
+        {@const valueK = (parseFloat(valueP) * parseFloat(valueN)) / 100 || 0}
+        <InputForm
+          disabled={true}
+          valueVariable={valueK.toFixed(2).toString()}
+          name="n° individuos"
+          variable="K"
+        />
+      {/if}
+
+      {#if !valueK && !valueQ}
         <InputForm
           placeholder="Probabilidad exito"
           name="% exito"
@@ -105,7 +149,18 @@
         />
       {/if}
 
-      {#if !valueP}
+      {#if valueP}
+        {@const valueQ = 100 - parseFloat(valueP)}
+        <InputForm
+          disabled={true}
+          valueVariable={valueQ.toFixed(2).toString()}
+          name="% fracaso"
+          variable="q"
+        />
+      {/if}
+      <!-- end valueP -->
+
+      {#if !valueK && !valueP}
         <InputForm
           placeholder="Probabilidad fracaso"
           name="% fracaso"
@@ -113,20 +168,34 @@
           bind:valueVariable={valueQ}
         />
       {/if}
+
+      <!-- If insert the valueK show the results to the other variables-->
+      {#if valueK}
+        {#if !valueN}
+          {required("N (Poblacion)")}
+        {/if}
+        {@const valueP = (parseFloat(valueK) / parseInt(valueN)) * 100}
+        {@const valueQ = 100 - parseFloat(valueP.toFixed(2))}
+        <InputForm
+          disabled={true}
+          valueVariable={valueP.toFixed(2).toString()}
+          name="% exito"
+          variable="p"
+        />
+        <InputForm
+          disabled={true}
+          valueVariable={valueQ.toFixed(2).toString()}
+          name="% fracaso"
+          variable="q"
+        />
+      {/if}
+      <!-- end valueK -->
+
       {#if parseInt(valueP) > 100 || parseInt(valueQ) > 100}
         {bigger0()}
       {/if}
       {#if parseInt(valueP) < 0 || parseInt(valueQ) < 0}
         {less0()}
-      {/if}
-      {#if valueP}
-        {@const valueQ = 100 - parseFloat(valueP)}
-        <InputForm
-          disabled={true}
-          valueVariable={valueQ.toFixed(2).toString()}
-          name="% fracaso"
-          variable="p"
-        />
       {/if}
     </div>
   </div>
@@ -146,9 +215,15 @@
     >
   {/if}
 
-  {#if valueM && (valueP || valueQ)}
+  {#if valueM && (valueP || valueQ || valueK)}
+    {#if valueK && !valueN}
+      {required("N (Poblacion)")}
+    {/if}
     {@const valueRes =
-      parseFloat(valueQ) > 0 ? 100 - parseFloat(valueQ) : parseFloat(valueP)}
+      100 - parseFloat(valueQ) ||
+      parseFloat(valueP) ||
+      (parseFloat(valueK) / parseInt(valueN)) * 100}
+
     <div class="stats shadow flex">
       <Stat statTitle="Media" statValue={average(parseInt(valueM), valueRes)} />
       <Stat statTitle="Curtosis">
@@ -183,9 +258,14 @@
   {/if}
 
   <!-- infinite contidions -->
-  {#if (valueN >= valueM || valueP || valueQ) && parseInt(valueX) >= 0}
+  {#if (valueN >= valueM || valueP || valueQ || valueK) && parseInt(valueX) >= 0}
+    {#if valueK && !valueN}
+      {required("N (Poblacion)")}
+    {/if}
     {@const valueRes =
-      parseFloat(valueQ) > 0 ? 100 - parseFloat(valueQ) : parseFloat(valueP)}
+      100 - parseFloat(valueQ) ||
+      parseFloat(valueP) ||
+      (parseFloat(valueK) / parseInt(valueN)) * 100}
     <div class="stats shadow flex">
       <Stat statTitle="Probabilidad segun condiciones de exito">
         {#if selected !== "="}
@@ -226,9 +306,14 @@
   {/if}
 
   <!-- finite conditions -->
-  {#if valueN && valueM && (valueP || valueQ) && valueN >= valueM}
+  {#if valueN && valueM && (valueP || valueQ || valueK) && valueN >= valueM}
+    {#if valueK && !valueN}
+      {required("N (Poblacion)")}
+    {/if}
     {@const valueRes =
-      parseFloat(valueQ) > 0 ? 100 - parseFloat(valueQ) : parseFloat(valueP)}
+      100 - parseFloat(valueQ) ||
+      parseFloat(valueP) ||
+      (parseFloat(valueK) / parseInt(valueN)) * 100}
     <div class="stats shadow flex">
       <Stat
         statTitle="Factor de Corrección"
@@ -246,9 +331,14 @@
       />
     </div>
   {/if}
-  {#if valueM && (valueP || valueQ)}
+  {#if valueM && (valueP || valueQ || valueK)}
+    {#if valueK && !valueN}
+      {required("N (Poblacion)")}
+    {/if}
     {@const valueRes =
-      parseFloat(valueQ) > 0 ? 100 - parseFloat(valueQ) : parseFloat(valueP)}
+      100 - parseFloat(valueQ) ||
+      parseFloat(valueP) ||
+      (parseFloat(valueK) / parseInt(valueN)) * 100}
     <div class="divider">Grafico</div>
     <BinomialChart
       options={optionsBinomialDistribution(
