@@ -45,7 +45,7 @@ export function skew(n: number, p: number) {
 }
 
 //function to calculate factorial
-function factorial(num: number) {
+export function factorial(num: number) {
   var factorial: number = 1;
 
   while (num >= 1) {
@@ -132,4 +132,5 @@ export default {
   binomialProbability,
   optionsBinomialDistribution,
   binomialProbabilityN,
+  factorial,
 };
