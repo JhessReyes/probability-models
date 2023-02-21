@@ -100,7 +100,9 @@
     </div>
   </div>
   <div class="flex justify-center w-full">
-    <div class="md:columns-3 sm:columns-1 sm:mx-10">
+    <div
+      class="${valueN ? 'md:columns-3' : 'md:columns-2'} flex sm:columns-1 sm:mx-10"
+    >
       <!-- If insert the valueQ show the results to the other variables-->
       {#if valueQ}
         {@const valueP = 100 - parseFloat(valueQ)}
@@ -120,7 +122,7 @@
       {/if}
       <!-- end valueQ -->
 
-      {#if !valueP && !valueQ}
+      {#if !valueP && !valueQ && valueN}
         <InputForm
           placeholder="n° Individuos"
           bind:valueVariable={valueK}
@@ -202,12 +204,12 @@
   <div class="divider">Resultados</div>
 
   <!-- title validations -->
-  {#if (!valueN || valueM <= (parseInt(valueN) * 0.05).toFixed(7)) && valueP}
+  {#if (!valueN || valueM <= (parseInt(valueN) * 0.05).toFixed(7)) && (valueP || valueQ || valueK)}
     <subtitle class="flex justify-center text-center text-[12px] sm:text-[25px]"
       >Distribucion Binomial con poblacion:
       <div class="text-primary space-x-4 font-bold mx-2">Infinita</div>
     </subtitle>
-  {:else if valueN && valueM && valueP && valueN >= valueM}
+  {:else if valueN && valueM && (valueP || valueQ || valueK) && valueN >= valueM}
     <subtitle
       class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
       >Distribucion Binomial con poblacion:
