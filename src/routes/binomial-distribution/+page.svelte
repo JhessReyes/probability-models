@@ -267,11 +267,13 @@
       parseFloat(valueP) ||
       (parseFloat(valueK) / parseInt(valueN)) * 100}
 
+    {@const valueKRes =
+      (parseFloat(valueRes.toFixed(2)) * parseFloat(valueN)) / 100}
     <div class="stats shadow flex">
       <Stat
         statTitle="Media"
         statValue={hypergeometric
-          ? hyperAverage(parseInt(valueN), parseInt(valueM), parseFloat(valueK))
+          ? hyperAverage(parseInt(valueN), parseInt(valueM), valueKRes)
           : average(parseInt(valueM), valueRes)}
       />
       <Stat statTitle="Curtosis">
@@ -314,6 +316,9 @@
       100 - parseFloat(valueQ) ||
       parseFloat(valueP) ||
       (parseFloat(valueK) / parseInt(valueN)) * 100}
+
+    {@const valueKRes =
+      (parseFloat(valueRes.toFixed(2)) * parseFloat(valueN)) / 100}
     <div class="stats shadow flex">
       {#if hypergeometric}
         <Stat
@@ -325,7 +330,7 @@
               parseInt(valueX),
               parseInt(valueN),
               parseInt(valueM),
-              parseFloat(valueK)
+              valueKRes
             )}
 
             {resHypN + " = " + (parseFloat(resHypN) * 100).toFixed(7) + "%"}
@@ -333,7 +338,7 @@
             {@const resHyp = hypergeometricProbability(
               parseInt(valueN),
               parseInt(valueM),
-              parseFloat(valueK),
+              valueKRes,
               parseInt(valueX)
             )}
 
@@ -374,6 +379,9 @@
       100 - parseFloat(valueQ) ||
       parseFloat(valueP) ||
       (parseFloat(valueK) / parseInt(valueN)) * 100}
+
+    {@const valueKRes =
+      (parseFloat(valueRes.toFixed(2)) * parseFloat(valueN)) / 100}
     <div class="stats shadow flex">
       <Stat
         statTitle="Factor de Corrección"
@@ -384,11 +392,7 @@
       <Stat
         statTitle="Desviación Estándar"
         statValue={hypergeometric
-          ? standarDeviation(
-              parseInt(valueN),
-              parseInt(valueM),
-              parseFloat(valueK)
-            )
+          ? standarDeviation(parseInt(valueN), parseInt(valueM), valueKRes)
           : deviation(
               parseFloat(correctionFactor(parseInt(valueN), parseInt(valueM))),
               parseInt(valueM),
