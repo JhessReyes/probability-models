@@ -1,3 +1,5 @@
+import { number } from "echarts";
+
 //AVERAGE
 export function average(n: number, p: number) {
   //convert
@@ -81,20 +83,49 @@ export function binomialProbabilityN(
   return result.toFixed(7);
 }
 
+//funton to return data probability table
+export function dataProbabilityTable(n: number, p: number) {
+  interface tableValues {
+    x: number;
+    pX: string;
+    pXA: string;
+  }
+
+  let vector: Array<tableValues> = [];
+  for (let i = 0; i <= n; i++) {
+    vector.push({
+      x: i,
+      pX: binomialProbability(i, n, p),
+      pXA: binomialProbabilityN(0, i, n, p),
+    });
+  }
+
+  return vector;
+}
+
 //function to create a graph
 export function optionsBinomialDistribution(
   n: number,
   p: number,
-  title: string
+  title: string,
+  acumulate: boolean
 ) {
   let dataX: Array<number> = [];
   let dataY: Array<number> = [];
   let options;
-
-  for (let i = 0; i <= n; i++) {
-    let position = parseFloat(binomialProbability(i, n, p));
-    dataY.push(position);
-    dataX.push(i);
+  let resultAcumulate: number = 0;
+  if (acumulate) {
+    for (let i = 0; i <= n; i++) {
+      resultAcumulate += parseFloat(binomialProbability(i, n, p));
+      dataY.push(resultAcumulate);
+      dataX.push(i);
+    }
+  } else {
+    for (let i = 0; i <= n; i++) {
+      let position = parseFloat(binomialProbability(i, n, p));
+      dataY.push(position);
+      dataX.push(i);
+    }
   }
 
   options = {
@@ -133,4 +164,5 @@ export default {
   optionsBinomialDistribution,
   binomialProbabilityN,
   factorial,
+  dataProbabilityTable,
 };

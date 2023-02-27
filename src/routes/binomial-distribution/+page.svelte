@@ -5,6 +5,7 @@
     binomialProbability,
     binomialProbabilityN,
     correctionFactor,
+    dataProbabilityTable,
     deviation,
     kurtosis,
     optionsBinomialDistribution,
@@ -19,6 +20,7 @@
     hypergeometricProbabilityN,
     standarDeviation,
   } from "../hypergeometric-distribution";
+  import ProbabilityTable from "../../components/organisms/ProbabilityTable.svelte";
   const { addNotification } = getNotificationsContext();
 
   const required = (variable: string) => {
@@ -55,6 +57,7 @@
   let valueK: string;
   let valueX: string;
   let valueX0: string;
+  let valueTol: string;
   let selected = "=";
   let options = ["=", "<="];
   let hypergeometric: boolean = false;
@@ -66,7 +69,10 @@
       valueM >= (parseInt(valueN) * 0.2).toFixed(7)
     ) {
       hypergeometric = true;
-    } else hypergeometric = false;
+    } else {
+      hypergeometric = false;
+      valueK = "";
+    }
   }
 
   /* $: {
@@ -97,12 +103,18 @@
 
   <div class="divider">Datos</div>
   <div class="flex justify-center w-full">
-    <div class="md:columns-3 sm:columns-1 sm:mx-10">
+    <div class="lg:columns-4 md:columns-1 sm:mx-10">
       <InputForm
         placeholder="Poblacion Total"
         name="Poblacion"
         variable="N"
         bind:valueVariable={valueN}
+      />
+      <InputForm
+        placeholder="Muestra"
+        name="Muestra"
+        variable="n"
+        bind:valueVariable={valueM}
       />
       <div>
         <InputForm
@@ -128,12 +140,14 @@
           </select>
         </InputForm>
       </div>
-      <InputForm
-        placeholder="Muestra"
-        name="Muestra"
-        variable="n"
-        bind:valueVariable={valueM}
-      />
+      {#if valueP || valueQ || valueK}
+        <InputForm
+          placeholder="Tolerancia"
+          name="% tolerancia"
+          variable="% tol"
+          bind:valueVariable={valueTol}
+        />
+      {/if}
     </div>
   </div>
   <div class="flex justify-center w-full">
@@ -409,12 +423,27 @@
       100 - parseFloat(valueQ) ||
       parseFloat(valueP) ||
       (parseFloat(valueK) / parseInt(valueN)) * 100}
-    <div class="divider">Grafico</div>
+    <div class="divider">Grafico Probabilidad</div>
     <BinomialChart
       options={optionsBinomialDistribution(
         parseInt(valueM),
         valueRes,
-        "Distribucion Binomial"
+        "Distribucion Binomial",
+        false
+      )}
+    />
+    <div class="divider">Tabla de Probabilidades</div>
+    <ProbabilityTable
+      vector={dataProbabilityTable(parseInt(valueM), valueRes)}
+      bind:tolerance={valueTol}
+    />
+    <div class="divider">Grafico Probabilidad Acumulada</div>
+    <BinomialChart
+      options={optionsBinomialDistribution(
+        parseInt(valueM),
+        valueRes,
+        "Distribucion Binomial",
+        true
       )}
     />
   {/if}
