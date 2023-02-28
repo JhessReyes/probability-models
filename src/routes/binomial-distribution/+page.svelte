@@ -75,6 +75,22 @@
     }
   }
 
+  $: if (
+    parseFloat(valueTol) > 100 ||
+    parseFloat(valueP) > 100 ||
+    parseFloat(valueQ) > 100 ||
+    parseInt(valueK) > 100
+  )
+    bigger0();
+
+  $: if (
+    parseFloat(valueP) < 0 ||
+    parseFloat(valueQ) < 0 ||
+    parseFloat(valueTol) < 0 ||
+    parseInt(valueK) < 0
+  )
+    less0();
+
   /* $: {
     if (
       valueN > valueM &&
@@ -245,13 +261,6 @@
         />
       {/if}
       <!-- end valueK -->
-
-      {#if parseInt(valueP) > 100 || parseInt(valueQ) > 100}
-        {bigger0()}
-      {/if}
-      {#if parseInt(valueP) < 0 || parseInt(valueQ) < 0}
-        {less0()}
-      {/if}
     </div>
   </div>
   <div class="divider">Resultados</div>
