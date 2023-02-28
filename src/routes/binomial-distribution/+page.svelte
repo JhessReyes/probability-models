@@ -436,6 +436,8 @@
       />
     </div>
   {/if}
+
+  <!-- Graph Section -->
   {#await toleranceFind}
     <div>Cargando...</div>
   {:then tol}
@@ -448,15 +450,43 @@
         parseFloat(valueP) ||
         (parseFloat(valueK) / parseInt(valueN)) * 100}
       <div class="divider">Grafico Probabilidad</div>
-      <BinomialChart
-        options={optionsBinomialDistribution(
-          parseInt(valueM),
-          valueRes,
-          "Distribucion Binomial",
-          false,
-          tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : ""
-        )}
-      />
+      <div class="carousel w-full">
+        <div id="slide2" class="carousel-item relative w-full">
+          <BinomialChart
+            options={optionsBinomialDistribution(
+              parseInt(valueM),
+              valueRes,
+              "Distribucion Binomial",
+              false,
+              tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : ""
+            )}
+          />
+          <div
+            class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+          >
+            <a href="#slide3" class="btn btn-circle">❮</a>
+            <a href="#slide3" class="btn btn-circle">❯</a>
+          </div>
+        </div>
+        <div id="slide3" class="carousel-item relative w-full">
+          <BinomialChart
+            options={optionsBinomialDistribution(
+              parseInt(valueM),
+              valueRes,
+              "Distribucion Binomial",
+              false,
+              tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+              "line"
+            )}
+          />
+          <div
+            class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+          >
+            <a href="#slide2" class="btn btn-circle">❮</a>
+            <a href="#slide2" class="btn btn-circle">❯</a>
+          </div>
+        </div>
+      </div>
       <div class="divider">Tabla de Probabilidades</div>
       <ProbabilityTable
         vector={dataProbabilityTable(parseInt(valueM), valueRes)}
@@ -464,28 +494,43 @@
         bind:valueTolerance={toleranceFind}
       />
       <div class="divider">Grafico Probabilidad Acumulada</div>
-
-      <div class="flex flex-row">
-        <BinomialChart
-          options={optionsBinomialDistribution(
-            parseInt(valueM),
-            valueRes,
-            "Distribucion Binomial",
-            true,
-            tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
-            "bar"
-          )}
-        />
-        <!--  <BinomialChart
-          options={optionsBinomialDistribution(
-            parseInt(valueM),
-            valueRes,
-            "Distribucion Binomial",
-            true,
-            "",
-            "line"
-          )}
-        /> -->
+      <div class="carousel w-full">
+        <div id="slide0" class="carousel-item relative w-full">
+          <BinomialChart
+            options={optionsBinomialDistribution(
+              parseInt(valueM),
+              valueRes,
+              "Distribucion Binomial",
+              true,
+              tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+              "bar"
+            )}
+          />
+          <div
+            class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+          >
+            <a href="#slide1" class="btn btn-circle">❮</a>
+            <a href="#slide1" class="btn btn-circle">❯</a>
+          </div>
+        </div>
+        <div id="slide1" class="carousel-item relative w-full">
+          <BinomialChart
+            options={optionsBinomialDistribution(
+              parseInt(valueM),
+              valueRes,
+              "Distribucion Binomial",
+              true,
+              tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+              "line"
+            )}
+          />
+          <div
+            class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+          >
+            <a href="#slide0" class="btn btn-circle">❮</a>
+            <a href="#slide0" class="btn btn-circle">❯</a>
+          </div>
+        </div>
       </div>
     {/if}
   {/await}
