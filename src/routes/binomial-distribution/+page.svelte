@@ -21,6 +21,7 @@
     standarDeviation,
   } from "../hypergeometric-distribution";
   import ProbabilityTable from "../../components/organisms/ProbabilityTable.svelte";
+  import Toggle from "../../components/atoms/Toggle.svelte";
   const { addNotification } = getNotificationsContext();
 
   const required = (variable: string) => {
@@ -62,6 +63,7 @@
   let selected = "=";
   let options = ["=", "<="];
   let hypergeometric: boolean = false;
+  let showBothProbability: boolean = false;
 
   $: {
     if (
@@ -344,53 +346,62 @@
     {@const valueKRes =
       (parseFloat(valueRes.toFixed(2)) * parseFloat(valueN)) / 100}
     <div class="stats shadow flex">
-      {#if hypergeometric}
-        <Stat
-          statTitle="Probabilidad segun condiciones de exito (hipergeométrica)"
-        >
-          {#if selected !== "="}
-            {@const resHypN = hypergeometricProbabilityN(
-              parseInt(valueX0),
-              parseInt(valueX),
-              parseInt(valueN),
-              parseInt(valueM),
-              valueKRes
-            )}
+      <div class="flex-col w-full">
+        <div class="px-5 pt-2">
+          <Toggle
+            bind:status={showBothProbability}
+            tooltip="Mostrar Ambos Resultados"
+          />
+        </div>
+        {#if hypergeometric || showBothProbability}
+          <Stat
+            statTitle="Probabilidad segun condiciones de exito (hipergeométrica)"
+          >
+            {#if selected !== "="}
+              {@const resHypN = hypergeometricProbabilityN(
+                parseInt(valueX0),
+                parseInt(valueX),
+                parseInt(valueN),
+                parseInt(valueM),
+                valueKRes
+              )}
 
-            {resHypN + " = " + (parseFloat(resHypN) * 100).toFixed(7) + "%"}
-          {:else}
-            {@const resHyp = hypergeometricProbability(
-              parseInt(valueN),
-              parseInt(valueM),
-              valueKRes,
-              parseInt(valueX)
-            )}
+              {resHypN + " = " + (parseFloat(resHypN) * 100).toFixed(7) + "%"}
+            {:else}
+              {@const resHyp = hypergeometricProbability(
+                parseInt(valueN),
+                parseInt(valueM),
+                valueKRes,
+                parseInt(valueX)
+              )}
 
-            {resHyp + " = " + (parseFloat(resHyp) * 100).toFixed(7) + "%"}
-          {/if}
-        </Stat>
-      {:else}
-        <Stat statTitle="Probabilidad segun condiciones de exito">
-          {#if selected !== "="}
-            {@const resBinN = binomialProbabilityN(
-              parseInt(valueX0),
-              parseInt(valueX),
-              parseInt(valueM),
-              valueRes
-            )}
+              {resHyp + " = " + (parseFloat(resHyp) * 100).toFixed(7) + "%"}
+            {/if}
+          </Stat>
+        {/if}
+        {#if !hypergeometric || showBothProbability}
+          <Stat statTitle="Probabilidad segun condiciones de exito (Binomial)">
+            {#if selected !== "="}
+              {@const resBinN = binomialProbabilityN(
+                parseInt(valueX0),
+                parseInt(valueX),
+                parseInt(valueM),
+                valueRes
+              )}
 
-            {resBinN + " = " + (parseFloat(resBinN) * 100).toFixed(7) + "%"}
-          {:else}
-            {@const resBin = binomialProbability(
-              parseInt(valueX),
-              parseInt(valueM),
-              valueRes
-            )}
+              {resBinN + " = " + (parseFloat(resBinN) * 100).toFixed(7) + "%"}
+            {:else}
+              {@const resBin = binomialProbability(
+                parseInt(valueX),
+                parseInt(valueM),
+                valueRes
+              )}
 
-            {resBin + " = " + (parseFloat(resBin) * 100).toFixed(7) + "%"}
-          {/if}
-        </Stat>
-      {/if}
+              {resBin + " = " + (parseFloat(resBin) * 100).toFixed(7) + "%"}
+            {/if}
+          </Stat>
+        {/if}
+      </div>
     </div>
   {/if}
 
@@ -465,7 +476,7 @@
             "bar"
           )}
         />
-       <!--  <BinomialChart
+        <!--  <BinomialChart
           options={optionsBinomialDistribution(
             parseInt(valueM),
             valueRes,
