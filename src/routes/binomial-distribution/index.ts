@@ -108,7 +108,9 @@ export function optionsBinomialDistribution(
   n: number,
   p: number,
   title: string,
-  acumulate: boolean
+  acumulate: boolean,
+  toleranceX: any = "",
+  type: string = "bar"
 ) {
   let dataX: Array<number> = [];
   let dataY: Array<number> = [];
@@ -144,9 +146,25 @@ export function optionsBinomialDistribution(
     yAxis: { type: "value" },
     series: [
       {
-        type: "line",
+        type: type,
         smooth: true,
         data: dataY,
+        markArea: {
+          itemStyle: {
+            color: "rgba(255, 173, 177, 0.5)",
+          },
+          data: [
+            [
+              {
+                name: "% Tolerancia",
+                xAxis: toleranceX,
+              },
+              {
+                xAxis: toleranceX,
+              },
+            ],
+          ],
+        },
       },
     ],
   };

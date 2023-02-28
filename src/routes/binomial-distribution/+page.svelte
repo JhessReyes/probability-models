@@ -58,6 +58,7 @@
   let valueX: string;
   let valueX0: string;
   let valueTol: string;
+  let toleranceFind: any;
   let selected = "=";
   let options = ["=", "<="];
   let hypergeometric: boolean = false;
@@ -424,36 +425,57 @@
       />
     </div>
   {/if}
-  {#if valueM && (valueP || valueQ || valueK)}
-    {#if valueK && !valueN}
-      {required("N (Poblacion)")}
+  {#await toleranceFind}
+    <div>Cargando...</div>
+  {:then tol}
+    {#if valueM && (valueP || valueQ || valueK)}
+      {#if valueK && !valueN}
+        {required("N (Poblacion)")}
+      {/if}
+      {@const valueRes =
+        100 - parseFloat(valueQ) ||
+        parseFloat(valueP) ||
+        (parseFloat(valueK) / parseInt(valueN)) * 100}
+      <div class="divider">Grafico Probabilidad</div>
+      <BinomialChart
+        options={optionsBinomialDistribution(
+          parseInt(valueM),
+          valueRes,
+          "Distribucion Binomial",
+          false,
+          tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : ""
+        )}
+      />
+      <div class="divider">Tabla de Probabilidades</div>
+      <ProbabilityTable
+        vector={dataProbabilityTable(parseInt(valueM), valueRes)}
+        bind:tolerance={valueTol}
+        bind:valueTolerance={toleranceFind}
+      />
+      <div class="divider">Grafico Probabilidad Acumulada</div>
+
+      <div class="flex flex-row">
+        <BinomialChart
+          options={optionsBinomialDistribution(
+            parseInt(valueM),
+            valueRes,
+            "Distribucion Binomial",
+            true,
+            tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+            "bar"
+          )}
+        />
+       <!--  <BinomialChart
+          options={optionsBinomialDistribution(
+            parseInt(valueM),
+            valueRes,
+            "Distribucion Binomial",
+            true,
+            "",
+            "line"
+          )}
+        /> -->
+      </div>
     {/if}
-    {@const valueRes =
-      100 - parseFloat(valueQ) ||
-      parseFloat(valueP) ||
-      (parseFloat(valueK) / parseInt(valueN)) * 100}
-    <div class="divider">Grafico Probabilidad</div>
-    <BinomialChart
-      options={optionsBinomialDistribution(
-        parseInt(valueM),
-        valueRes,
-        "Distribucion Binomial",
-        false
-      )}
-    />
-    <div class="divider">Tabla de Probabilidades</div>
-    <ProbabilityTable
-      vector={dataProbabilityTable(parseInt(valueM), valueRes)}
-      bind:tolerance={valueTol}
-    />
-    <div class="divider">Grafico Probabilidad Acumulada</div>
-    <BinomialChart
-      options={optionsBinomialDistribution(
-        parseInt(valueM),
-        valueRes,
-        "Distribucion Binomial",
-        true
-      )}
-    />
-  {/if}
+  {/await}
 </section>
