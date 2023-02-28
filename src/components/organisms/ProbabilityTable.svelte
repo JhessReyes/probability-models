@@ -46,7 +46,7 @@
             {#each vector as x}
               <tr
                 class={value.length > 0
-                  ? value[value.length - 1].pXA === x.pXA
+                  ? value[value.length - 1].x === x.x
                     ? "active"
                     : ""
                   : ""}
