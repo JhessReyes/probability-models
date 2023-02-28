@@ -5,6 +5,7 @@
     binomialProbability,
     binomialProbabilityN,
     correctionFactor,
+    dataProbabilityTable,
     deviation,
     kurtosis,
     optionsBinomialDistribution,
@@ -19,6 +20,8 @@
     hypergeometricProbabilityN,
     standarDeviation,
   } from "../hypergeometric-distribution";
+  import ProbabilityTable from "../../components/organisms/ProbabilityTable.svelte";
+  import Toggle from "../../components/atoms/Toggle.svelte";
   const { addNotification } = getNotificationsContext();
 
   const required = (variable: string) => {
@@ -55,9 +58,12 @@
   let valueK: string;
   let valueX: string;
   let valueX0: string;
+  let valueTol: string;
+  let toleranceFind: any;
   let selected = "=";
   let options = ["=", "<="];
   let hypergeometric: boolean = false;
+  let showBothProbability: boolean = false;
 
   $: {
     if (
@@ -66,8 +72,27 @@
       valueM >= (parseInt(valueN) * 0.2).toFixed(7)
     ) {
       hypergeometric = true;
-    } else hypergeometric = false;
+    } else {
+      hypergeometric = false;
+      valueK = "";
+    }
   }
+
+  $: if (
+    parseFloat(valueTol) > 100 ||
+    parseFloat(valueP) > 100 ||
+    parseFloat(valueQ) > 100 ||
+    parseInt(valueK) > 100
+  )
+    bigger0();
+
+  $: if (
+    parseFloat(valueP) < 0 ||
+    parseFloat(valueQ) < 0 ||
+    parseFloat(valueTol) < 0 ||
+    parseInt(valueK) < 0
+  )
+    less0();
 
   /* $: {
     if (
@@ -97,12 +122,18 @@
 
   <div class="divider">Datos</div>
   <div class="flex justify-center w-full">
-    <div class="md:columns-3 sm:columns-1 sm:mx-10">
+    <div class="lg:columns-4 md:columns-1 sm:mx-10">
       <InputForm
         placeholder="Poblacion Total"
         name="Poblacion"
         variable="N"
         bind:valueVariable={valueN}
+      />
+      <InputForm
+        placeholder="Muestra"
+        name="Muestra"
+        variable="n"
+        bind:valueVariable={valueM}
       />
       <div>
         <InputForm
@@ -128,12 +159,14 @@
           </select>
         </InputForm>
       </div>
-      <InputForm
-        placeholder="Muestra"
-        name="Muestra"
-        variable="n"
-        bind:valueVariable={valueM}
-      />
+      {#if valueP || valueQ || valueK}
+        <InputForm
+          placeholder="Tolerancia"
+          name="% tolerancia"
+          variable="% tol"
+          bind:valueVariable={valueTol}
+        />
+      {/if}
     </div>
   </div>
   <div class="flex justify-center w-full">
@@ -231,13 +264,6 @@
         />
       {/if}
       <!-- end valueK -->
-
-      {#if parseInt(valueP) > 100 || parseInt(valueQ) > 100}
-        {bigger0()}
-      {/if}
-      {#if parseInt(valueP) < 0 || parseInt(valueQ) < 0}
-        {less0()}
-      {/if}
     </div>
   </div>
   <div class="divider">Resultados</div>
@@ -320,53 +346,62 @@
     {@const valueKRes =
       (parseFloat(valueRes.toFixed(2)) * parseFloat(valueN)) / 100}
     <div class="stats shadow flex">
-      {#if hypergeometric}
-        <Stat
-          statTitle="Probabilidad segun condiciones de exito (hipergeométrica)"
-        >
-          {#if selected !== "="}
-            {@const resHypN = hypergeometricProbabilityN(
-              parseInt(valueX0),
-              parseInt(valueX),
-              parseInt(valueN),
-              parseInt(valueM),
-              valueKRes
-            )}
+      <div class="flex-col w-full">
+        <div class="px-5 pt-2">
+          <Toggle
+            bind:status={showBothProbability}
+            tooltip="Mostrar Ambos Resultados"
+          />
+        </div>
+        {#if hypergeometric || showBothProbability}
+          <Stat
+            statTitle="Probabilidad segun condiciones de exito (hipergeométrica)"
+          >
+            {#if selected !== "="}
+              {@const resHypN = hypergeometricProbabilityN(
+                parseInt(valueX0),
+                parseInt(valueX),
+                parseInt(valueN),
+                parseInt(valueM),
+                valueKRes
+              )}
 
-            {resHypN + " = " + (parseFloat(resHypN) * 100).toFixed(7) + "%"}
-          {:else}
-            {@const resHyp = hypergeometricProbability(
-              parseInt(valueN),
-              parseInt(valueM),
-              valueKRes,
-              parseInt(valueX)
-            )}
+              {resHypN + " = " + (parseFloat(resHypN) * 100).toFixed(7) + "%"}
+            {:else}
+              {@const resHyp = hypergeometricProbability(
+                parseInt(valueN),
+                parseInt(valueM),
+                valueKRes,
+                parseInt(valueX)
+              )}
 
-            {resHyp + " = " + (parseFloat(resHyp) * 100).toFixed(7) + "%"}
-          {/if}
-        </Stat>
-      {:else}
-        <Stat statTitle="Probabilidad segun condiciones de exito">
-          {#if selected !== "="}
-            {@const resBinN = binomialProbabilityN(
-              parseInt(valueX0),
-              parseInt(valueX),
-              parseInt(valueM),
-              valueRes
-            )}
+              {resHyp + " = " + (parseFloat(resHyp) * 100).toFixed(7) + "%"}
+            {/if}
+          </Stat>
+        {/if}
+        {#if !hypergeometric || showBothProbability}
+          <Stat statTitle="Probabilidad segun condiciones de exito (Binomial)">
+            {#if selected !== "="}
+              {@const resBinN = binomialProbabilityN(
+                parseInt(valueX0),
+                parseInt(valueX),
+                parseInt(valueM),
+                valueRes
+              )}
 
-            {resBinN + " = " + (parseFloat(resBinN) * 100).toFixed(7) + "%"}
-          {:else}
-            {@const resBin = binomialProbability(
-              parseInt(valueX),
-              parseInt(valueM),
-              valueRes
-            )}
+              {resBinN + " = " + (parseFloat(resBinN) * 100).toFixed(7) + "%"}
+            {:else}
+              {@const resBin = binomialProbability(
+                parseInt(valueX),
+                parseInt(valueM),
+                valueRes
+              )}
 
-            {resBin + " = " + (parseFloat(resBin) * 100).toFixed(7) + "%"}
-          {/if}
-        </Stat>
-      {/if}
+              {resBin + " = " + (parseFloat(resBin) * 100).toFixed(7) + "%"}
+            {/if}
+          </Stat>
+        {/if}
+      </div>
     </div>
   {/if}
 
@@ -401,21 +436,102 @@
       />
     </div>
   {/if}
-  {#if valueM && (valueP || valueQ || valueK)}
-    {#if valueK && !valueN}
-      {required("N (Poblacion)")}
+
+  <!-- Graph Section -->
+  {#await toleranceFind}
+    <div>Cargando...</div>
+  {:then tol}
+    {#if valueM && (valueP || valueQ || valueK)}
+      {#if valueK && !valueN}
+        {required("N (Poblacion)")}
+      {/if}
+      {@const valueRes =
+        100 - parseFloat(valueQ) ||
+        parseFloat(valueP) ||
+        (parseFloat(valueK) / parseInt(valueN)) * 100}
+      <div class="divider">Grafico Probabilidad</div>
+      <div class="carousel w-full">
+        <div id="slide2" class="carousel-item relative w-full">
+          <BinomialChart
+            options={optionsBinomialDistribution(
+              parseInt(valueM),
+              valueRes,
+              "Distribucion Binomial",
+              false,
+              tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : ""
+            )}
+          />
+          <div
+            class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+          >
+            <a href="#slide3" class="btn btn-circle">❮</a>
+            <a href="#slide3" class="btn btn-circle">❯</a>
+          </div>
+        </div>
+        <div id="slide3" class="carousel-item relative w-full">
+          <BinomialChart
+            options={optionsBinomialDistribution(
+              parseInt(valueM),
+              valueRes,
+              "Distribucion Binomial",
+              false,
+              tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+              "line"
+            )}
+          />
+          <div
+            class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+          >
+            <a href="#slide2" class="btn btn-circle">❮</a>
+            <a href="#slide2" class="btn btn-circle">❯</a>
+          </div>
+        </div>
+      </div>
+      <div class="divider">Tabla de Probabilidades</div>
+      <ProbabilityTable
+        vector={dataProbabilityTable(parseInt(valueM), valueRes)}
+        bind:tolerance={valueTol}
+        bind:valueTolerance={toleranceFind}
+      />
+      <div class="divider">Grafico Probabilidad Acumulada</div>
+      <div class="carousel w-full">
+        <div id="slide0" class="carousel-item relative w-full">
+          <BinomialChart
+            options={optionsBinomialDistribution(
+              parseInt(valueM),
+              valueRes,
+              "Distribucion Binomial",
+              true,
+              tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+              "bar"
+            )}
+          />
+          <div
+            class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+          >
+            <a href="#slide1" class="btn btn-circle">❮</a>
+            <a href="#slide1" class="btn btn-circle">❯</a>
+          </div>
+        </div>
+        <div id="slide1" class="carousel-item relative w-full">
+          <BinomialChart
+            options={optionsBinomialDistribution(
+              parseInt(valueM),
+              valueRes,
+              "Distribucion Binomial",
+              true,
+              tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+              "line"
+            )}
+          />
+          <div
+            class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+          >
+            <a href="#slide0" class="btn btn-circle">❮</a>
+            <a href="#slide0" class="btn btn-circle">❯</a>
+          </div>
+        </div>
+      </div>
     {/if}
-    {@const valueRes =
-      100 - parseFloat(valueQ) ||
-      parseFloat(valueP) ||
-      (parseFloat(valueK) / parseInt(valueN)) * 100}
-    <div class="divider">Grafico</div>
-    <BinomialChart
-      options={optionsBinomialDistribution(
-        parseInt(valueM),
-        valueRes,
-        "Distribucion Binomial"
-      )}
-    />
-  {/if}
+  {/await}
 </section>
