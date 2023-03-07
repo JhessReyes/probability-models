@@ -103,6 +103,42 @@ export function dataProbabilityTable(n: number, p: number) {
   return vector;
 }
 
+//function to return data
+export function dataBinomialDistribution(
+  n: number,
+  p: number,
+  acumulate: boolean,
+  toleranceX: any = ""
+) {
+  let dataX: Array<number> = [];
+  let dataY: Array<any> = [];
+  let resultAcumulate: number = 0;
+  if (acumulate) {
+    for (let i = 0; i <= n; i++) {
+      resultAcumulate += parseFloat(binomialProbability(i, n, p));
+      dataY.push(resultAcumulate);
+      dataX.push(i);
+    }
+  } else {
+    for (let i = 0; i <= n; i++) {
+      let position = parseFloat(binomialProbability(i, n, p));
+      dataY.push(position);
+      dataX.push(i);
+    }
+  }
+
+  if (toleranceX !== -1) {
+    dataY[toleranceX] = {
+      value: dataY[toleranceX],
+      itemStyle: {
+        color: "#a90000",
+      },
+    };
+  }
+
+  return { dataX: dataX, dataY: dataY };
+}
+
 //function to create a graph
 export function optionsBinomialDistribution(
   n: number,
@@ -113,7 +149,7 @@ export function optionsBinomialDistribution(
   type: string = "bar"
 ) {
   let dataX: Array<number> = [];
-  let dataY: Array<number> = [];
+  let dataY: Array<any> = [];
   let options;
   let resultAcumulate: number = 0;
   if (acumulate) {
@@ -130,41 +166,66 @@ export function optionsBinomialDistribution(
     }
   }
 
+  if (toleranceX !== -1) {
+    dataY[toleranceX] = {
+      value: dataY[toleranceX],
+      itemStyle: {
+        color: "#a90000",
+      },
+    };
+  }
   options = {
-    title: { text: "" },
-    tooltip: {},
+    title: { text: title, left: 10 },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "shadow",
+      },
+    },
     toolbox: {
       feature: {
-        dataView: {},
+        dataZoom: {
+          yAxisIndex: false,
+        },
         saveAsImage: {
           pixelRatio: 2,
         },
-        restore: {},
       },
     },
-    xAxis: { type: "category", data: dataX },
-    yAxis: { type: "value" },
+    grid: {
+      bottom: 90,
+    },
+    dataZoom: [
+      {
+        type: "inside",
+      },
+      {
+        type: "slider",
+      },
+    ],
+    xAxis: {
+      type: "category",
+      data: dataX,
+      silent: false,
+      splitLine: {
+        show: false,
+      },
+      splitArea: {
+        show: false,
+      },
+    },
+    yAxis: {
+      type: "value",
+      splitArea: {
+        show: false,
+      },
+    },
     series: [
       {
         type: type,
         smooth: true,
         data: dataY,
-        markArea: {
-          itemStyle: {
-            color: "rgba(255, 173, 177, 0.5)",
-          },
-          data: [
-            [
-              {
-                name: "% Tolerancia",
-                xAxis: toleranceX,
-              },
-              {
-                xAxis: toleranceX,
-              },
-            ],
-          ],
-        },
+        large: true,
       },
     ],
   };
@@ -183,4 +244,5 @@ export default {
   binomialProbabilityN,
   factorial,
   dataProbabilityTable,
+  dataBinomialDistribution,
 };
