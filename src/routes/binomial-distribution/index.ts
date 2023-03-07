@@ -113,7 +113,7 @@ export function optionsBinomialDistribution(
   type: string = "bar"
 ) {
   let dataX: Array<number> = [];
-  let dataY: Array<number> = [];
+  let dataY: Array<any> = [];
   let options;
   let resultAcumulate: number = 0;
   if (acumulate) {
@@ -130,41 +130,66 @@ export function optionsBinomialDistribution(
     }
   }
 
+  if (toleranceX !== -1) {
+    dataY[toleranceX] = {
+      value: dataY[toleranceX],
+      itemStyle: {
+        color: "#a90000",
+      },
+    };
+  }
   options = {
-    title: { text: "" },
-    tooltip: {},
+    title: { text: title, left: 10 },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "shadow",
+      },
+    },
     toolbox: {
       feature: {
-        dataView: {},
+        dataZoom: {
+          yAxisIndex: false,
+        },
         saveAsImage: {
           pixelRatio: 2,
         },
-        restore: {},
       },
     },
-    xAxis: { type: "category", data: dataX },
-    yAxis: { type: "value" },
+    grid: {
+      bottom: 90,
+    },
+    dataZoom: [
+      {
+        type: "inside",
+      },
+      {
+        type: "slider",
+      },
+    ],
+    xAxis: {
+      type: "category",
+      data: dataX,
+      silent: false,
+      splitLine: {
+        show: false,
+      },
+      splitArea: {
+        show: false,
+      },
+    },
+    yAxis: {
+      type: "value",
+      splitArea: {
+        show: false,
+      },
+    },
     series: [
       {
         type: type,
         smooth: true,
         data: dataY,
-        markArea: {
-          itemStyle: {
-            color: "rgba(255, 173, 177, 0.5)",
-          },
-          data: [
-            [
-              {
-                name: "% Tolerancia",
-                xAxis: toleranceX,
-              },
-              {
-                xAxis: toleranceX,
-              },
-            ],
-          ],
-        },
+        large: true,
       },
     ],
   };
