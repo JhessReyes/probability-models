@@ -431,6 +431,10 @@
               {resPois + " = " + (parseFloat(resPois) * 100).toFixed(7) + "%"}
             {/if}
           </Stat>
+          <Stat
+            statTitle="Desviación Estándar"
+            statValue={Math.pow(parseInt(valueM) * valueRes, 1 / 2).toFixed(4)}
+          />
         {/if}
       </div>
     </div>
