@@ -22,6 +22,12 @@
   } from "../hypergeometric-distribution";
   import ProbabilityTable from "../../components/organisms/ProbabilityTable.svelte";
   import Toggle from "../../components/atoms/Toggle.svelte";
+  import {
+    dataPoissonTable,
+    optionsPoissonDistribution,
+    poissonProbability,
+    poissonProbabilityN,
+  } from "../poisson-distribution";
   const { addNotification } = getNotificationsContext();
 
   const required = (variable: string) => {
@@ -63,8 +69,9 @@
   let selected = "=";
   let options = ["=", "<="];
   let hypergeometric: boolean = false;
+  let poisson: boolean = false;
   let showBothProbability: boolean = false;
-
+  let avrg: any;
   $: {
     if (
       valueN > valueM &&
@@ -76,6 +83,7 @@
       hypergeometric = false;
       valueK = "";
     }
+    avrg < 10 || parseFloat(valueP) < 10 ? (poisson = true) : (poisson = false);
   }
 
   $: if (
@@ -294,14 +302,15 @@
       (parseFloat(valueK) / parseInt(valueN)) * 100}
 
     {@const valueKRes =
-      (parseFloat(valueRes.toFixed(2)) * parseFloat(valueN)) / 100}
+      (parseFloat(valueRes.toFixed(2)) / 100) * parseFloat(valueN)}
     <div class="stats shadow flex">
-      <Stat
-        statTitle="Media"
-        statValue={hypergeometric
+      <div class="hidden">
+        {(avrg = hypergeometric
           ? hyperAverage(parseInt(valueN), parseInt(valueM), valueKRes)
-          : average(parseInt(valueM), valueRes)}
-      />
+          : average(parseInt(valueM), valueRes))}
+        {(valueP = valueKRes.toString())}
+      </div>
+      <Stat statTitle="Media" statValue={avrg} />
       <Stat statTitle="Curtosis">
         <div class="flex flex-col">
           <div>
@@ -350,7 +359,7 @@
         <div class="px-5 pt-2">
           <Toggle
             bind:status={showBothProbability}
-            tooltip="Mostrar Ambos Resultados"
+            tooltip="Mostrar Todos los Resultados"
           />
         </div>
         {#if hypergeometric || showBothProbability}
@@ -398,6 +407,28 @@
               )}
 
               {resBin + " = " + (parseFloat(resBin) * 100).toFixed(7) + "%"}
+            {/if}
+          </Stat>
+        {/if}
+        {#if poisson || showBothProbability}
+          <Stat statTitle="Probabilidad segun condiciones de exito (Poisson)">
+            {#if selected !== "="}
+              {@const resPoisN = poissonProbabilityN(
+                parseInt(valueX0),
+                parseInt(valueX),
+                parseInt(valueM),
+                valueRes
+              )}
+
+              {resPoisN + " = " + (parseFloat(resPoisN) * 100).toFixed(7) + "%"}
+            {:else}
+              {@const resPois = poissonProbability(
+                parseInt(valueX),
+                parseInt(valueM),
+                valueRes
+              )}
+
+              {resPois + " = " + (parseFloat(resPois) * 100).toFixed(7) + "%"}
             {/if}
           </Stat>
         {/if}
@@ -449,89 +480,177 @@
         100 - parseFloat(valueQ) ||
         parseFloat(valueP) ||
         (parseFloat(valueK) / parseInt(valueN)) * 100}
-      <div class="divider">Grafico Probabilidad</div>
-      <div class="carousel w-full">
-        <div id="slide2" class="carousel-item relative w-full">
-          <BinomialChart
-            options={optionsBinomialDistribution(
-              parseInt(valueM),
-              valueRes,
-              "Distribucion Binomial",
-              false,
-              tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : ""
-            )}
-          />
-          <div
-            class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
-          >
-            <a href="#slide3" class="btn btn-circle">❮</a>
-            <a href="#slide3" class="btn btn-circle">❯</a>
+
+      {#if poisson}
+        <div class="divider">Grafico Probabilidad (Poisson)</div>
+
+        <div class="carousel w-full">
+          <div id="slide2" class="carousel-item relative w-full">
+            <BinomialChart
+              options={optionsPoissonDistribution(
+                parseInt(valueM),
+                valueRes,
+                "Distribucion de Poisson",
+                false,
+                tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : ""
+              )}
+            />
+            <div
+              class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+            >
+              <a href="#slide3" class="btn btn-circle">❮</a>
+              <a href="#slide3" class="btn btn-circle">❯</a>
+            </div>
+          </div>
+          <div id="slide3" class="carousel-item relative w-full">
+            <BinomialChart
+              options={optionsPoissonDistribution(
+                parseInt(valueM),
+                valueRes,
+                "Distribucion de Poisson",
+                false,
+                tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+                "line"
+              )}
+            />
+            <div
+              class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+            >
+              <a href="#slide2" class="btn btn-circle">❮</a>
+              <a href="#slide2" class="btn btn-circle">❯</a>
+            </div>
           </div>
         </div>
-        <div id="slide3" class="carousel-item relative w-full">
-          <BinomialChart
-            options={optionsBinomialDistribution(
-              parseInt(valueM),
-              valueRes,
-              "Distribucion Binomial",
-              false,
-              tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
-              "line"
-            )}
-          />
-          <div
-            class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
-          >
-            <a href="#slide2" class="btn btn-circle">❮</a>
-            <a href="#slide2" class="btn btn-circle">❯</a>
+        <div class="divider">Tabla de Probabilidades</div>
+        <ProbabilityTable
+          vector={dataPoissonTable(parseInt(valueM), valueRes)}
+          bind:tolerance={valueTol}
+          bind:valueTolerance={toleranceFind}
+        />
+        <div class="divider">Grafico Probabilidad Acumulada</div>
+        <div class="carousel w-full">
+          <div id="slide0" class="carousel-item relative w-full">
+            <BinomialChart
+              options={optionsPoissonDistribution(
+                parseInt(valueM),
+                valueRes,
+                "Distribucion de Poisson",
+                true,
+                tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+                "bar"
+              )}
+            />
+            <div
+              class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+            >
+              <a href="#slide1" class="btn btn-circle">❮</a>
+              <a href="#slide1" class="btn btn-circle">❯</a>
+            </div>
+          </div>
+          <div id="slide1" class="carousel-item relative w-full">
+            <BinomialChart
+              options={optionsPoissonDistribution(
+                parseInt(valueM),
+                valueRes,
+                "Distribucion de Poisson",
+                true,
+                tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+                "line"
+              )}
+            />
+            <div
+              class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+            >
+              <a href="#slide0" class="btn btn-circle">❮</a>
+              <a href="#slide0" class="btn btn-circle">❯</a>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="divider">Tabla de Probabilidades</div>
-      <ProbabilityTable
-        vector={dataProbabilityTable(parseInt(valueM), valueRes)}
-        bind:tolerance={valueTol}
-        bind:valueTolerance={toleranceFind}
-      />
-      <div class="divider">Grafico Probabilidad Acumulada</div>
-      <div class="carousel w-full">
-        <div id="slide0" class="carousel-item relative w-full">
-          <BinomialChart
-            options={optionsBinomialDistribution(
-              parseInt(valueM),
-              valueRes,
-              "Distribucion Binomial",
-              true,
-              tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
-              "bar"
-            )}
-          />
-          <div
-            class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
-          >
-            <a href="#slide1" class="btn btn-circle">❮</a>
-            <a href="#slide1" class="btn btn-circle">❯</a>
+      {:else}
+        <div class="divider">Grafico Probabilidad</div>
+        <div class="carousel w-full">
+          <div id="slide2" class="carousel-item relative w-full">
+            <BinomialChart
+              options={optionsBinomialDistribution(
+                parseInt(valueM),
+                valueRes,
+                "Distribucion Binomial",
+                false,
+                tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : ""
+              )}
+            />
+            <div
+              class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+            >
+              <a href="#slide3" class="btn btn-circle">❮</a>
+              <a href="#slide3" class="btn btn-circle">❯</a>
+            </div>
+          </div>
+          <div id="slide3" class="carousel-item relative w-full">
+            <BinomialChart
+              options={optionsBinomialDistribution(
+                parseInt(valueM),
+                valueRes,
+                "Distribucion Binomial",
+                false,
+                tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+                "line"
+              )}
+            />
+            <div
+              class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+            >
+              <a href="#slide2" class="btn btn-circle">❮</a>
+              <a href="#slide2" class="btn btn-circle">❯</a>
+            </div>
           </div>
         </div>
-        <div id="slide1" class="carousel-item relative w-full">
-          <BinomialChart
-            options={optionsBinomialDistribution(
-              parseInt(valueM),
-              valueRes,
-              "Distribucion Binomial",
-              true,
-              tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
-              "line"
-            )}
-          />
-          <div
-            class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
-          >
-            <a href="#slide0" class="btn btn-circle">❮</a>
-            <a href="#slide0" class="btn btn-circle">❯</a>
+        <div class="divider">Tabla de Probabilidades</div>
+        <ProbabilityTable
+          vector={dataProbabilityTable(parseInt(valueM), valueRes)}
+          bind:tolerance={valueTol}
+          bind:valueTolerance={toleranceFind}
+        />
+        <div class="divider">Grafico Probabilidad Acumulada</div>
+        <div class="carousel w-full">
+          <div id="slide0" class="carousel-item relative w-full">
+            <BinomialChart
+              options={optionsBinomialDistribution(
+                parseInt(valueM),
+                valueRes,
+                "Distribucion Binomial",
+                true,
+                tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+                "bar"
+              )}
+            />
+            <div
+              class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+            >
+              <a href="#slide1" class="btn btn-circle">❮</a>
+              <a href="#slide1" class="btn btn-circle">❯</a>
+            </div>
+          </div>
+          <div id="slide1" class="carousel-item relative w-full">
+            <BinomialChart
+              options={optionsBinomialDistribution(
+                parseInt(valueM),
+                valueRes,
+                "Distribucion Binomial",
+                true,
+                tol ? (tol.length > 0 ? tol[tol.length - 1].x : "") : "",
+                "line"
+              )}
+            />
+            <div
+              class="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2"
+            >
+              <a href="#slide0" class="btn btn-circle">❮</a>
+              <a href="#slide0" class="btn btn-circle">❯</a>
+            </div>
           </div>
         </div>
-      </div>
+      {/if}
     {/if}
   {/await}
 </section>
