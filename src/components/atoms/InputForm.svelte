@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte";
+  const dispatch = createEventDispatcher();
   export let placeholder: string = "";
   export let variable: string = "";
   export let name: string = "";
@@ -23,6 +25,8 @@
       class="input input-bordered w-full max-w-xs"
       bind:value={valueVariable}
       min="0"
+      on:change={(e) => dispatch("change", e)}
+      on:blur={(e) => dispatch("blur", e)}
     />
   </label>
 </div>
