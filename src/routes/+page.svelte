@@ -76,6 +76,7 @@
   let valueFC: any;
 
   let toleranceFind: any;
+  let toleranceBinomialFind: any;
   let selected = "=";
   let options = ["=", "<="];
   let hypergeometric: boolean = false;
@@ -182,10 +183,10 @@
       : (typeSkew = "Sesgo Positivo");
 
     valueKurtosis < 0
-      ? (typeKurt = "PLATICÚRTICA")
+      ? (typeKurt = "Platicurtica")
       : valueKurtosis == 0
-      ? (typeKurt = "MESOCÚRTICA")
-      : (typeKurt = "LEPTOCÚRTICA");
+      ? (typeKurt = "Mesocurtica")
+      : (typeKurt = "Leptocurtica");
   }
 
   $: if (
@@ -433,43 +434,63 @@
     </div>
   {/if}
 </div>
-<div class="flex flex-col py-5 items-center justify-center">
-  <div>
+<div class="flex flex-col py-5 items-center justify-center text-lg font-bold">
+  <div class="flex flex-row">
     {#if !hypergeometric}
       {#if (!valueN || valueM <= (parseInt(valueN) * 0.05).toFixed(7)) && (valueP || valueQ || valueK)}
-        <subtitle
-          class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
-          >Distribucion Binomial con poblacion:
+        <subtitle class="justify-center text-center">
+          Distribucion Binomial con poblacion:
           <div class="text-primary space-x-4 font-bold mx-2">Infinita</div>
         </subtitle>
       {:else if valueN && valueM && (valueP || valueQ || valueK) && valueN >= valueM}
-        <subtitle
-          class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
-          >Distribucion Binomial con poblacion:
-          <div class="text-primary space-x-4 font-bold mx-2">
-            Finita
-          </div></subtitle
-        >
+        <subtitle>
+          Distribucion Binomial con poblacion:
+          <div class="text-primary space-x-4 font-bold mx-2">Finita</div>
+        </subtitle>
       {/if}
     {/if}
   </div>
   <div>
     {#if valueSkew}
-      <subtitle
-        class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
-        >Sesgo de Tipo:
+      <subtitle>
+        Sesgo de Tipo:
         <div class="text-primary space-x-4 font-bold mx-2">{typeSkew}</div>
       </subtitle>
     {/if}
   </div>
   <div>
     {#if valueKurtosis}
-      <subtitle
-        class="flex justify-center text-center text-[12px] sm:text-[25px] font-bold"
-        >Curtosis de Tipo:
+      <subtitle>
+        Curtosis de Tipo:
         <div class="text-primary space-x-4 font-bold mx-2">{typeKurt}</div>
       </subtitle>
     {/if}
+  </div>
+  <div>
+    {#await toleranceFind}
+      <div>Cargando...</div>
+    {:then tol}
+      <div>
+        Tolerancia (poisson): {valueTol} = x: {tol
+          ? tol.length > 0
+            ? tol[tol.length - 1].x
+            : ""
+          : ""}
+      </div>
+    {/await}
+  </div>
+  <div>
+    {#await toleranceBinomialFind}
+      <div>Cargando...</div>
+    {:then tol}
+      <div>
+        Tolerancia (Binomial): {valueTol} = x: {tol
+          ? tol.length > 0
+            ? tol[tol.length - 1].x
+            : ""
+          : ""}
+      </div>
+    {/await}
   </div>
 </div>
 <div class="divider">Graficos Probabilidad</div>
@@ -526,7 +547,7 @@
     <ProbabilityTable
       vector={dataProbabilityTable(parseInt(valueM), valueP)}
       bind:tolerance={valueTol}
-      bind:valueTolerance={toleranceFind}
+      bind:valueTolerance={toleranceBinomialFind}
     />
   {/if}
 </div>
