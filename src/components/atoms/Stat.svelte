@@ -3,7 +3,7 @@
   export let statTitle = "";
 </script>
 
-<div class="stat">
+<div class="stat items-center justify-center text-center">
   <div class="stat-figure text-secondary">
     <svg
       xmlns="http://www.w3.org/2000/svg"

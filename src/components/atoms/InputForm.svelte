@@ -6,6 +6,7 @@
   export let name: string = "";
   export let disabled: boolean = false;
   export let valueVariable: string;
+  export let step: string = "0.01";
 </script>
 
 <!-- svelte-ignore a11y-label-has-associated-control -->
@@ -25,6 +26,7 @@
       class="input input-bordered w-full max-w-xs"
       bind:value={valueVariable}
       min="0"
+      {step}
       on:change={(e) => dispatch("change", e)}
       on:blur={(e) => dispatch("blur", e)}
     />
