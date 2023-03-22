@@ -77,8 +77,8 @@
 
   let toleranceFind: any;
   let toleranceBinomialFind: any;
-  let selected = "=";
-  let options = ["=", "<="];
+  let selected = "===";
+  let options = ["===", "<="];
   let hypergeometric: boolean = false;
   let poisson: boolean = false;
   let showPoisson: boolean = false;
@@ -242,7 +242,7 @@
         variable="x"
         bind:valueVariable={valueX}
       >
-        {#if selected !== "="}
+        {#if selected !== "==="}
           <input
             type="number"
             placeholder={"x0"}
@@ -364,7 +364,7 @@
           <Stat
             statTitle="Probabilidad segun condiciones de exito (hipergeométrica)"
           >
-            {#if selected !== "="}
+            {#if selected !== "==="}
               {@const resHypN = hypergeometricProbabilityN(
                 parseInt(valueX0),
                 parseInt(valueX),
@@ -388,7 +388,7 @@
         {/if}
         {#if !hypergeometric || showBothProbability}
           <Stat statTitle="Probabilidad segun condiciones de exito (Binomial)">
-            {#if selected !== "="}
+            {#if selected !== "==="}
               {@const resBinN = binomialProbabilityN(
                 parseInt(valueX0),
                 parseInt(valueX),
@@ -410,7 +410,7 @@
         {/if}
         {#if poisson || showBothProbability}
           <Stat statTitle="Probabilidad segun condiciones de exito (Poisson)">
-            {#if selected !== "="}
+            {#if selected !== "==="}
               {@const resPoisN = poissonProbabilityN(
                 parseInt(valueX0),
                 parseInt(valueX),
