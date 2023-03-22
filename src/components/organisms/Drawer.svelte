@@ -36,6 +36,12 @@
         >
           <a href="/binomial-distribution">Distribucion Binomial</a>
         </li>
+        <li
+          class="hover-bordered"
+          aria-current={$page.url.pathname === "/m-m-1" ? "page" : undefined}
+        >
+          <a href="/m-m-1">Modelo M/M/1</a>
+        </li>
       </ul>
     </div>
   </div>
