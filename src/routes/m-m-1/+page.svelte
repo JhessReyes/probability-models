@@ -2,6 +2,8 @@
   import { Lq, Ls, p, Pn, Wq, Ws } from ".";
   import InputForm from "../../components/atoms/InputForm.svelte";
   import Stat from "../../components/atoms/Stat.svelte";
+  import { BinomialChart } from "../../components/organisms";
+  import { optionsChartsTails } from "../schema";
 
   let rateArrival: any;
   let rateService: any;
@@ -17,17 +19,19 @@
   let options = ["===", "<="];
   //OnChange Input
   function handleChange(e: Event, variable: string) {
-    if (variable === "tll" || variable === "tss") {
-      if (rateArrival && rateService) {
-        valueWq = Wq(rateArrival, rateService);
-        /*valueWs = Ws(parseFloat(valueWq), rateService); */
-        valueWs = Ws(rateArrival, rateService);
-        /* if (!isFinite(valueWs)) valueWs = "Infinito"; */
-        valueLq = Lq(rateArrival, parseFloat(valueWq));
-        valueLs = Ls(rateArrival, parseFloat(valueWs));
-        valueBusy = p(rateArrival, rateService);
-      }
+    /*  if (variable === "tll" || variable === "tss") {
+     */
+    if (rateArrival && rateService) {
+      valueWq = variable === "wq" ? valueWq : Wq(rateArrival, rateService);
+      /*valueWs = Ws(parseFloat(valueWq), rateService); */
+      valueWs = Ws(parseFloat(valueWq), rateService);
+      /* if (!isFinite(valueWs)) valueWs = "Infinito"; */
+      valueLq = Lq(rateArrival, parseFloat(valueWq));
+      valueLs = Ls(rateArrival, parseFloat(valueWs));
+      valueBusy = p(rateArrival, rateService);
     }
+    /*     } */
+    /*     if (variable === "wq") valueWq = valueWq; */
   }
 </script>
 
@@ -39,7 +43,7 @@
 
 <div class="divider">Datos</div>
 <div class="flex justify-center w-full">
-  <div class="lg:columns-2 md:columns-1 sm:mx-10">
+  <div class="lg:columns-3 md:columns-1 sm:mx-10">
     <InputForm
       placeholder="Tiempo Llegada"
       name="Tiempo Llegada (TTL)"
@@ -59,6 +63,7 @@
         placeholder="N"
         name="No. Clientes"
         variable="n"
+        step="1"
         bind:valueVariable={valueN}
       >
         {#if selected !== "==="}
@@ -67,6 +72,7 @@
             placeholder={"N0"}
             class="input input-bordered w-full max-w-xs"
             min="0"
+            step="1"
             bind:value={valueN0}
           />
         {/if}
@@ -82,12 +88,13 @@
 </div>
 <div class="divider">Resultados</div>
 <div class="flex justify-center w-full">
-  <div class="lg:columns-4 md:columns-1 sm:mx-10">
+  <div class="lg:columns-2 md:columns-1 sm:mx-10">
     <InputForm
       placeholder="Tiempo Espera (cola)"
       name="Tiempo Espera (cola)"
       variable="Wq"
       bind:valueVariable={valueWq}
+      on:change={(e) => handleChange(e, "wq")}
     />
     <InputForm
       placeholder="Tiempo Espera (sistema)"
@@ -95,6 +102,10 @@
       variable="Ws"
       bind:valueVariable={valueWs}
     />
+  </div>
+</div>
+<div class="flex justify-center w-full">
+  <div class="lg:columns-3 md:columns-1 sm:mx-10">
     <InputForm
       placeholder="Clientes (cola)"
       name="Clientes (cola)"
@@ -107,24 +118,33 @@
       variable="Ls"
       bind:valueVariable={valueLs}
     />
-  </div>
-</div>
-<div class="flex justify-center w-full">
-  <div class="lg:columns-2 md:columns-1 sm:mx-10">
     <InputForm
       placeholder="Uso del sistema"
       name="Uso del sistema"
-      variable="p"
+      variable="ρ"
       bind:valueVariable={valueBusy}
     />
   </div>
 </div>
-{#if rateArrival && rateService && valueN}
-  <Stat statTitle="Probabilidad segun condiciones de exito">
+{#if rateArrival && rateService && valueN >= 0}
+  <Stat statTitle="Probabilidad segun condiciones de exito P({valueN})">
     {#if selected === "==="}
       {@const resPn = Pn(rateArrival, rateService, valueN)}
 
       {resPn + " = " + (parseFloat(resPn) * 100).toFixed(7) + "%"}
     {:else}{/if}
   </Stat>
+  <div class="divider">Graficos Probabilidad</div>
+  <div>
+    <BinomialChart
+      options={optionsChartsTails(
+        valueN,
+        "Graficos",
+        "line",
+        rateArrival,
+        rateService,
+        ["mm1"]
+      )}
+    />
+  </div>
 {/if}

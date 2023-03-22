@@ -1,5 +1,6 @@
 import { binomialProbability } from "./binomial-distribution";
 import { hypergeometricProbability } from "./hypergeometric-distribution";
+import { Pn } from "./m-m-1";
 import { poissonProbability } from "./poisson-distribution";
 
 //function to create a Multi graph
@@ -122,6 +123,94 @@ export function optionsCharts(
         large: true,
       },
     ],
+  };
+
+  return options;
+}
+
+//function to create a Multi graph
+export function optionsChartsTails(
+  n: number,
+  title: string,
+  type: string = "bar",
+  TLL: number = 0,
+  TS: number = 0,
+  show: Array<any>
+) {
+  let dataX: Array<number> = [];
+  let dataMM1: Array<any> = [];
+  let options;
+  let resMM1: number = 0;
+
+  for (let i = 0; i <= n; i++) {
+    resMM1 = parseFloat(Pn(TLL, TS, i));
+    dataMM1.push(resMM1);
+    dataX.push(i);
+  }
+
+  let mm1Values = {};
+  if (show.includes("mm1")) {
+    mm1Values = {
+      name: "M/M/1",
+      type: type,
+      smooth: true,
+      data: dataMM1,
+      large: true,
+    };
+  }
+  options = {
+    title: { text: title, left: 10 },
+    tooltip: {
+      trigger: "axis",
+      axisPointer: {
+        type: "shadow",
+      },
+    },
+    legend: {
+      data: ["Binomial", "Hipergeometrica", "Poisson"],
+    },
+    toolbox: {
+      feature: {
+        dataZoom: {
+          yAxisIndex: false,
+        },
+        saveAsImage: {
+          pixelRatio: 2,
+        },
+      },
+    },
+    grid: {
+      left: "3%",
+      right: "4%",
+      bottom: 90,
+      containLabel: true,
+    },
+    dataZoom: [
+      {
+        type: "inside",
+      },
+      {
+        type: "slider",
+      },
+    ],
+    xAxis: {
+      type: "category",
+      data: dataX,
+      silent: false,
+      splitLine: {
+        show: false,
+      },
+      splitArea: {
+        show: false,
+      },
+    },
+    yAxis: {
+      type: "value",
+      splitArea: {
+        show: false,
+      },
+    },
+    series: [mm1Values],
   };
 
   return options;

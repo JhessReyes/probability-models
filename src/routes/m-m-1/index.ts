@@ -7,11 +7,11 @@ export function Wq(TLL: number, TS: number) {
 }
 
 //Ws Calculate
-export function Ws(TLL: number, TS: number) {
+export function Ws(Wq: number, TS: number) {
   let Ws = null;
-  /* 
-  Ws = Wq + 1 / TS; */
-  Ws = parseFloat(Wq(TLL, TS)) + 1 / TS;
+
+  Ws = Wq + 1 / TS;
+  /*   Ws = parseFloat(Wq(TLL, TS)) + 1 / TS; */
   return Ws.toFixed(4);
 }
 
@@ -44,10 +44,14 @@ export function Pn(TLL: number, TS: number, n: number) {
   let Pn = null;
 
   Pn = (1 - TLL / TS) * Math.pow(TLL / TS, n);
-  return Pn.toFixed(4);
+  return Pn.toFixed(8);
 }
 
 export default {
   Wq,
   Ws,
+  Lq,
+  Ls,
+  p,
+  Pn,
 };
