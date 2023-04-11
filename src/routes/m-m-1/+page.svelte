@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Lq, Ls, p, Pn, Wq, Ws } from ".";
+  import { Lq, Ls, p, Pn, PWqt, PWst, Wq, Ws } from ".";
   import InputForm from "../../components/atoms/InputForm.svelte";
   import Stat from "../../components/atoms/Stat.svelte";
   import { BinomialChart } from "../../components/organisms";
@@ -14,7 +14,9 @@
   let valueBusy: any;
   let valueN0: any;
   let valueN: any;
+  let valueT: any = 0;
 
+  $: console.log(valueT);
   let selected = "===";
   let options = ["===", "<="];
   //OnChange Input
@@ -43,7 +45,7 @@
 
 <div class="divider">Datos</div>
 <div class="flex justify-center w-full">
-  <div class="lg:columns-3 md:columns-1 sm:mx-10">
+  <div class="lg:columns-4 md:columns-1 sm:mx-10">
     <InputForm
       placeholder="Tiempo Llegada"
       name="Tiempo Llegada (TTL)"
@@ -83,6 +85,12 @@
           {#each options as value}<option {value}>{value}</option>{/each}
         </select>
       </InputForm>
+      <InputForm
+        placeholder="tiempo de espera"
+        name="Tiempo de espera"
+        variable="t"
+        bind:valueVariable={valueT}
+      />
     </div>
   </div>
 </div>
@@ -123,6 +131,29 @@
       name="Uso del sistema"
       variable="ρ"
       bind:valueVariable={valueBusy}
+    />
+  </div>
+</div>
+<div class="flex justify-center w-full">
+  <div class="lg:columns-3 md:columns-1 sm:mx-10">
+    <InputForm
+      placeholder={`Probabilidad de t (cola)`}
+      name={`Probabilidad de t(${valueT}) (cola)`}
+      variable="P(Wq > t)"
+      valueVariable={PWqt(valueBusy, rateService, valueT)}
+    />
+    <InputForm
+      placeholder={`Probabilidad de t (sistema)`}
+      name={`Probabilidad de t(${valueT}) (sistema)`}
+      variable="P(Ws > t)"
+      valueVariable={PWst(valueBusy, rateService, valueT)}
+    />
+    <InputForm
+      placeholder="Oscio del sistema"
+      name="Ocio del sistema"
+      variable="1-ρ"
+      valueVariable={(1 - valueBusy).toString()}
+      on:input={(e) => (valueBusy = 1 - e?.detail)}
     />
   </div>
 </div>

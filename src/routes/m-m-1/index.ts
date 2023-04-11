@@ -47,6 +47,22 @@ export function Pn(TLL: number, TS: number, n: number) {
   return Pn.toFixed(8);
 }
 
+//Probability P(Wq>t)
+export function PWqt(p: number, TS: number, t: number) {
+  let P = null;
+
+  P = p * Math.pow(Math.exp(1), -TS * (1 - p) * t);
+  return P.toFixed(8);
+}
+
+//Probability P(Ws>t)
+export function PWst(p: number, TS: number, t: number) {
+  let P = null;
+
+  P = Math.pow(Math.exp(1), -TS * (1 - p) * t);
+  return P.toFixed(8);
+}
+
 export default {
   Wq,
   Ws,
@@ -54,4 +70,6 @@ export default {
   Ls,
   p,
   Pn,
+  PWqt,
+  PWst
 };
