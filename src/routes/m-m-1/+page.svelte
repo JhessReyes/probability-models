@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Lq, Ls, p, Pn, PWqt, PWst, Wq, Ws } from ".";
+  import { Lq, Ls, optionsChartsMM1, p, Pn, PWqt, PWst, Wq, Ws } from ".";
   import InputForm from "../../components/atoms/InputForm.svelte";
   import Stat from "../../components/atoms/Stat.svelte";
   import { BinomialChart } from "../../components/organisms";
@@ -195,6 +195,19 @@
         rateArrival || (1 - valueWs * rateService) / -valueWs,
         rateService || 1 / (valueWs - valueWq),
         ["mm1"]
+      )}
+    />
+  </div>
+  <div class="divider">Graficos Probabilidad (tiempo)</div>
+  <div>
+    <BinomialChart
+      options={optionsChartsMM1(
+        valueT,
+        valueBusy,
+        "Probabilidad (tiempo)",
+        false,
+        "line",
+        rateService || 1 / (valueWs - valueWq)
       )}
     />
   </div>
