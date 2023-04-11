@@ -27,7 +27,8 @@
       bind:value={valueVariable}
       min="0"
       {step}
-      on:change={(e) => dispatch("change", e)}
+      on:input={(e) => dispatch("input", valueVariable)}
+      on:change={(e) => dispatch("change", valueVariable)}
       on:blur={(e) => dispatch("blur", e)}
     />
   </label>

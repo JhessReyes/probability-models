@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Lq, Ls, p, Pn, Wq, Ws } from ".";
+  import { Lq, Ls, p, Pn, PWqt, PWst, Wq, Ws } from ".";
   import InputForm from "../../components/atoms/InputForm.svelte";
   import Stat from "../../components/atoms/Stat.svelte";
   import { BinomialChart } from "../../components/organisms";
@@ -14,24 +14,32 @@
   let valueBusy: any;
   let valueN0: any;
   let valueN: any;
+  let valueT: any = 0;
 
+  /* $: console.log(valueBusy); */
+  $: valueBusy = (valueWq / valueWs).toString() || p(rateArrival, rateService);
   let selected = "===";
   let options = ["===", "<="];
   //OnChange Input
   function handleChange(e: Event, variable: string) {
-    /*  if (variable === "tll" || variable === "tss") {
-     */
-    if (rateArrival && rateService) {
-      valueWq = variable === "wq" ? valueWq : Wq(rateArrival, rateService);
-      /*valueWs = Ws(parseFloat(valueWq), rateService); */
-      valueWs = Ws(parseFloat(valueWq), rateService);
+    if (rateArrival || rateService) {
+      if (rateArrival && rateService) {
+        valueWq = Wq(rateArrival, rateService);
+      } else valueWq = (variable === "wq" || valueWq) && valueWq;
+      if (rateService) {
+        valueWs = Ws(parseFloat(valueWq), rateService);
+      } else valueWs = (variable === "ws" || valueWs) && valueWs;
+
       /* if (!isFinite(valueWs)) valueWs = "Infinito"; */
-      valueLq = Lq(rateArrival, parseFloat(valueWq));
-      valueLs = Ls(rateArrival, parseFloat(valueWs));
-      valueBusy = p(rateArrival, rateService);
+      valueLq = Lq(
+        rateArrival || (1 - valueWs * rateService) / -valueWs,
+        parseFloat(valueWq)
+      );
+      valueLs = Ls(
+        rateArrival || (1 - valueWs * rateService) / -valueWs,
+        parseFloat(valueWs)
+      );
     }
-    /*     } */
-    /*     if (variable === "wq") valueWq = valueWq; */
   }
 </script>
 
@@ -43,7 +51,7 @@
 
 <div class="divider">Datos</div>
 <div class="flex justify-center w-full">
-  <div class="lg:columns-3 md:columns-1 sm:mx-10">
+  <div class="lg:columns-4 md:columns-1 sm:mx-10">
     <InputForm
       placeholder="Tiempo Llegada"
       name="Tiempo Llegada (TTL)"
@@ -83,6 +91,12 @@
           {#each options as value}<option {value}>{value}</option>{/each}
         </select>
       </InputForm>
+      <InputForm
+        placeholder="tiempo de espera"
+        name="Tiempo de espera"
+        variable="t"
+        bind:valueVariable={valueT}
+      />
     </div>
   </div>
 </div>
@@ -101,6 +115,7 @@
       name="Tiempo Espera (sistema)"
       variable="Ws"
       bind:valueVariable={valueWs}
+      on:change={(e) => handleChange(e, "ws")}
     />
   </div>
 </div>
@@ -123,13 +138,49 @@
       name="Uso del sistema"
       variable="ρ"
       bind:valueVariable={valueBusy}
+      on:input={(e) => (valueBusy = e?.detail)}
     />
   </div>
 </div>
-{#if rateArrival && rateService && valueN >= 0}
+<div class="flex justify-center w-full">
+  <div class="lg:columns-3 md:columns-1 sm:mx-10">
+    <InputForm
+      placeholder={`Probabilidad de t (cola)`}
+      name={`Probabilidad de t(${valueT}) (cola)`}
+      variable="P(Wq > t)"
+      valueVariable={PWqt(
+        valueBusy,
+        rateService || 1 / (valueWs - valueWq),
+        valueT
+      )}
+    />
+    <InputForm
+      placeholder={`Probabilidad de t (sistema)`}
+      name={`Probabilidad de t(${valueT}) (sistema)`}
+      variable="P(Ws > t)"
+      valueVariable={PWst(
+        valueBusy,
+        rateService || 1 / (valueWs - valueWq),
+        valueT
+      )}
+    />
+    <InputForm
+      placeholder="Oscio del sistema"
+      name="Ocio del sistema"
+      variable="1-ρ"
+      valueVariable={(1 - valueBusy).toString()}
+      on:input={(e) => (valueBusy = 1 - e?.detail)}
+    />
+  </div>
+</div>
+{#if (rateArrival || (1 - valueWs * rateService) / -valueWs) && (rateService || 1 / (valueWs - valueWq)) && valueN >= 0}
   <Stat statTitle="Probabilidad segun condiciones de exito P({valueN})">
     {#if selected === "==="}
-      {@const resPn = Pn(rateArrival, rateService, valueN)}
+      {@const resPn = Pn(
+        rateArrival || (1 - valueWs * rateService) / -valueWs,
+        rateService || 1 / (valueWs - valueWq),
+        valueN
+      )}
 
       {resPn + " = " + (parseFloat(resPn) * 100).toFixed(7) + "%"}
     {:else}{/if}
@@ -141,8 +192,8 @@
         valueN,
         "Graficos",
         "line",
-        rateArrival,
-        rateService,
+        rateArrival || (1 - valueWs * rateService) / -valueWs,
+        rateService || 1 / (valueWs - valueWq),
         ["mm1"]
       )}
     />
