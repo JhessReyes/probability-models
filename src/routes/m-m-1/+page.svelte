@@ -16,24 +16,30 @@
   let valueN: any;
   let valueT: any = 0;
 
-  $: console.log(valueT);
+  /* $: console.log(valueBusy); */
+  $: valueBusy = (valueWq / valueWs).toString() || p(rateArrival, rateService);
   let selected = "===";
   let options = ["===", "<="];
   //OnChange Input
   function handleChange(e: Event, variable: string) {
-    /*  if (variable === "tll" || variable === "tss") {
-     */
-    if (rateArrival && rateService) {
-      valueWq = variable === "wq" ? valueWq : Wq(rateArrival, rateService);
-      /*valueWs = Ws(parseFloat(valueWq), rateService); */
-      valueWs = Ws(parseFloat(valueWq), rateService);
+    if (rateArrival || rateService) {
+      if (rateArrival && rateService) {
+        valueWq = Wq(rateArrival, rateService);
+      } else valueWq = (variable === "wq" || valueWq) && valueWq;
+      if (rateService) {
+        valueWs = Ws(parseFloat(valueWq), rateService);
+      } else valueWs = (variable === "ws" || valueWs) && valueWs;
+
       /* if (!isFinite(valueWs)) valueWs = "Infinito"; */
-      valueLq = Lq(rateArrival, parseFloat(valueWq));
-      valueLs = Ls(rateArrival, parseFloat(valueWs));
-      valueBusy = p(rateArrival, rateService);
+      valueLq = Lq(
+        rateArrival || (1 - valueWs * rateService) / -valueWs,
+        parseFloat(valueWq)
+      );
+      valueLs = Ls(
+        rateArrival || (1 - valueWs * rateService) / -valueWs,
+        parseFloat(valueWs)
+      );
     }
-    /*     } */
-    /*     if (variable === "wq") valueWq = valueWq; */
   }
 </script>
 
@@ -109,6 +115,7 @@
       name="Tiempo Espera (sistema)"
       variable="Ws"
       bind:valueVariable={valueWs}
+      on:change={(e) => handleChange(e, "ws")}
     />
   </div>
 </div>
@@ -131,6 +138,7 @@
       name="Uso del sistema"
       variable="ρ"
       bind:valueVariable={valueBusy}
+      on:input={(e) => (valueBusy = e?.detail)}
     />
   </div>
 </div>
@@ -140,13 +148,21 @@
       placeholder={`Probabilidad de t (cola)`}
       name={`Probabilidad de t(${valueT}) (cola)`}
       variable="P(Wq > t)"
-      valueVariable={PWqt(valueBusy, rateService, valueT)}
+      valueVariable={PWqt(
+        valueBusy,
+        rateService || 1 / (valueWs - valueWq),
+        valueT
+      )}
     />
     <InputForm
       placeholder={`Probabilidad de t (sistema)`}
       name={`Probabilidad de t(${valueT}) (sistema)`}
       variable="P(Ws > t)"
-      valueVariable={PWst(valueBusy, rateService, valueT)}
+      valueVariable={PWst(
+        valueBusy,
+        rateService || 1 / (valueWs - valueWq),
+        valueT
+      )}
     />
     <InputForm
       placeholder="Oscio del sistema"
@@ -157,10 +173,14 @@
     />
   </div>
 </div>
-{#if rateArrival && rateService && valueN >= 0}
+{#if (rateArrival || (1 - valueWs * rateService) / -valueWs) && (rateService || 1 / (valueWs - valueWq)) && valueN >= 0}
   <Stat statTitle="Probabilidad segun condiciones de exito P({valueN})">
     {#if selected === "==="}
-      {@const resPn = Pn(rateArrival, rateService, valueN)}
+      {@const resPn = Pn(
+        rateArrival || (1 - valueWs * rateService) / -valueWs,
+        rateService || 1 / (valueWs - valueWq),
+        valueN
+      )}
 
       {resPn + " = " + (parseFloat(resPn) * 100).toFixed(7) + "%"}
     {:else}{/if}
@@ -172,8 +192,8 @@
         valueN,
         "Graficos",
         "line",
-        rateArrival,
-        rateService,
+        rateArrival || (1 - valueWs * rateService) / -valueWs,
+        rateService || 1 / (valueWs - valueWq),
         ["mm1"]
       )}
     />

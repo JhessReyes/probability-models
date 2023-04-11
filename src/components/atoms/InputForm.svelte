@@ -28,7 +28,7 @@
       min="0"
       {step}
       on:input={(e) => dispatch("input", valueVariable)}
-      on:change={(e) => dispatch("change", e)}
+      on:change={(e) => dispatch("change", valueVariable)}
       on:blur={(e) => dispatch("blur", e)}
     />
   </label>
